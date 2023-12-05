@@ -1,7 +1,5 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FilteringOptionsComponent } from './filtering-options/filtering-options.component';
-import { ItemsListComponent } from './items-list/items-list.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -45,8 +43,6 @@ const DATA: Item[] = [
   standalone: true,
   imports: [
     CommonModule,
-    FilteringOptionsComponent,
-    ItemsListComponent,
     MatFormFieldModule,
     MatTableModule,
     MatPaginatorModule,
