@@ -12,15 +12,8 @@ import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {AsyncPipe} from '@angular/common';
 import {MatInputModule} from '@angular/material/input';
+import { Item } from '../../models/Item';
 
-export interface Item {
-  itemID: number;
-  name: string;
-  category: string;
-  status: string;
-  dateReserved: string;
-  borrower: string;
-}
 
 const DATA: Item[] = [
   { itemID: 1, name: "Portable Workhorse", category: "Laptop", status: "Available", dateReserved: "N/A", borrower: "N/A" },
