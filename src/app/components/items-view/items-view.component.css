@@ -1,0 +1,14 @@
+.container {
+    /* display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; */
+    padding: 20px;
+}
+mat-table {
+    width: 100%;
+}
+
+.mat-column-select {
+    overflow: initial;
+  }
