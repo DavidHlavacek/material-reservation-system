@@ -10,10 +10,18 @@
       [matAutocomplete]="auto" 
       (keyup)="applyFilter($event)" />
     <mat-autocomplete #auto="matAutocomplete">
-        @for (option of filteredOptions | async; track option) {
-            <mat-option [value]="option">{{option}}</mat-option>
+        @for (searchOption of searchFilteredOptions | async; track searchOption) {
+            <mat-option [value]="searchOption">{{searchOption}}</mat-option>
           }
     </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field appearance="fill" *ngFor="let itemsfilters of itemsFilters">
+    <mat-label>{{itemsfilters.name}}</mat-label>
+    <mat-select [(value)]="itemsfilters.defaultValue" (selectionChange)="applyItemsFilters($event, itemsfilters)">
+      <mat-option *ngFor="let op of itemsfilters.options" [value]="op">
+        {{op}}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 </form>
 
