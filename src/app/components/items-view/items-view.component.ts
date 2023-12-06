@@ -195,16 +195,29 @@ export class ItemsComponent implements AfterViewInit, OnInit {
       .toLowerCase();
 
     // Reset filterPredicate to default
+
+    //THIS IS THE DEFAULT IMPLEMENTATION OF THE FILTER PREDICATE
+    //I DEFINE IT IN BOTH applyFilter() AND applyItemsFilters() 
+    //SO THAT BOTH CAN BE USED (INDEPENDENTLY)!!
+    //P.S.: Yes, I am a genius (((; - David
     this.dataSource.filterPredicate = (data, filter) => {
+      // Transform the data into a lowercase string of all property values.
       const dataStr = Object.keys(data)
         .reduce((currentTerm: string, key: string) => {
-          return currentTerm + (data as { [key: string]: any })[key] + '◬';
+          // Use an obscure Unicode character to delimit the words in the concatenated string.
+          // This avoids matches where the values of two columns combined will match the user's query
+          // (e.g. `Flute` and `Stop` will match `Test`). The character is intended to be something
+          // that has a very low chance of being typed in by somebody in a text field. This one in
+          // particular is "White up-pointing triangle with dot" from
+          // https://en.wikipedia.org/wiki/List_of_Unicode_characters
+          return currentTerm + (data as {[key: string]: any})[key] + '◬';
         }, '')
         .toLowerCase();
-
+  
+      // Transform the filter by converting it to lowercase and removing whitespace.
       const transformedFilter = filter.trim().toLowerCase();
-
-      return dataStr.includes(transformedFilter);
+  
+      return dataStr.indexOf(transformedFilter) != -1;
     };
 
     // Apply the new filter to the data source
@@ -216,6 +229,8 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   applyItemsFilters(ob: MatSelectChange, itemsfilters: ItemsFilters) {
     this.myControl.setValue('');
 
+    //THIS IS THE SECOND CUSTOM IMPLEMENTATION OF THE FILTER PREDICATE
+    //TO MAKE THE COLUMNS FILTERS WORK!!!!
     this.dataSource.filterPredicate = function (record, filter) {
       var map = new Map(JSON.parse(filter));
       let isMatch = false;
