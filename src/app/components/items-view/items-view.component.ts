@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Item } from '../../models/Item';
 import { MatSelectChange } from '@angular/material/select';
 
+// Dummy data for testing purposes
 const DATA: Item[] = [
   {
     itemID: 1,
@@ -115,11 +116,15 @@ const DATA: Item[] = [
   },
 ];
 
+//name of the filter, options for the filter, default value of the filter which is always "All"
 export interface ItemsFilters {
   name: string;
   options: string[];
   defaultValue: string;
 }
+//Example: name - Status
+//         options - Available, Damaged, Rented Out
+//         defaultValue - All
 
 @Component({
   selector: 'app-items-view',
@@ -146,18 +151,47 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   searchOptions: string[] = DATA.map(item => item.name);
   searchFilteredOptions!: Observable<string[]>;
 
-  categories: string[] = ['All', ...new Set(DATA.map(item => item.category))];
+  //Set is used to remove duplicates
+  //This is to populate the filter options that are displayed in the dropdown, gave example above in the interface
+  categories: string[] = ['All', ...new Set(DATA.map(item => item.category))]; 
   statuses: string[] = ['All', ...new Set(DATA.map(item => item.status))];
   borrowers: string[] = ['All', ...new Set(DATA.map(item => item.borrower))];
   defaultValue: string = 'All';
   itemsFilters: ItemsFilters[] = [];
 
+  filterDictionary = new Map<string, string>();
+
+  columnsToDisplay: string[] = [
+    'select',
+    'itemID',
+    'name',
+    'category',
+    'status',
+    'dateReserved',
+    'borrower',
+  ];
+
+  dataSource = new MatTableDataSource<Item>(DATA);
+
+  initialSelection = [];
+  allowMultiSelect = true;
+  selection = new SelectionModel<Item>(
+    this.allowMultiSelect,
+    this.initialSelection
+  );
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+
   ngOnInit() {
+    //This is for the search bar
     this.searchFilteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value || ''))
     );
 
+    //This is for the filter dropdowns, define the filter options here
     this.itemsFilters.push({
       name: 'category',
       options: this.categories,
@@ -175,6 +209,13 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     });
   }
 
+  //This is for the pagination and sorting
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
+  //this is for the search bar's autocomplete
   private _filter(value: string): string[] {
     if (value) {
       this.itemsFilters.forEach(filter => {
@@ -189,34 +230,47 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     );
   }
 
+  //this is for the search bar immediate filtering when typing
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value
       .trim()
       .toLowerCase();
 
     // Reset filterPredicate to default
+    // filterPredicate is a function that defines how to filter,
+    // it is different for the search bar, and different for the columns filter, 
+    // so I have to reset it and redefine it 
+    // depending on what the user chooses to filter with
+    // SO, if the user starts typing in the search bar, 
+    // the filterPredicate will be set to this,
+    // and the columnns filters all reset to "All"
+    // and vice versa, if the user chooses a column filter,
+    // the filterPredicate will be set to the second implementation
+    // and the search bar will be reset to empty
 
     //THIS IS THE DEFAULT IMPLEMENTATION OF THE FILTER PREDICATE
-    //I DEFINE IT IN BOTH applyFilter() AND applyItemsFilters() 
+    //I DEFINE IT IN BOTH applyFilter() AND applyItemsFilters()
     //SO THAT BOTH CAN BE USED (INDEPENDENTLY)!!
     //P.S.: Yes, I am a genius (((; - David
     this.dataSource.filterPredicate = (data, filter) => {
       // Transform the data into a lowercase string of all property values.
       const dataStr = Object.keys(data)
         .reduce((currentTerm: string, key: string) => {
+          // VVV This is from the documentation VVV
+          
           // Use an obscure Unicode character to delimit the words in the concatenated string.
           // This avoids matches where the values of two columns combined will match the user's query
           // (e.g. `Flute` and `Stop` will match `Test`). The character is intended to be something
           // that has a very low chance of being typed in by somebody in a text field. This one in
           // particular is "White up-pointing triangle with dot" from
           // https://en.wikipedia.org/wiki/List_of_Unicode_characters
-          return currentTerm + (data as {[key: string]: any})[key] + '◬';
+          return currentTerm + (data as { [key: string]: any })[key] + '◬';
         }, '')
         .toLowerCase();
-  
+
       // Transform the filter by converting it to lowercase and removing whitespace.
       const transformedFilter = filter.trim().toLowerCase();
-  
+
       return dataStr.indexOf(transformedFilter) != -1;
     };
 
@@ -224,9 +278,12 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.dataSource.filter = filterValue;
   }
 
-  filterDictionary = new Map<string, string>();
 
+  //this is for the columns filters
   applyItemsFilters(ob: MatSelectChange, itemsfilters: ItemsFilters) {
+    //reset the data structure
+    this.filterDictionary.clear();
+
     this.myControl.setValue('');
 
     //THIS IS THE SECOND CUSTOM IMPLEMENTATION OF THE FILTER PREDICATE
@@ -250,39 +307,14 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.dataSource.filter = jsonString;
   }
 
-  columnsToDisplay: string[] = [
-    'select',
-    'itemID',
-    'name',
-    'category',
-    'status',
-    'dateReserved',
-    'borrower',
-  ];
-  dataSource = new MatTableDataSource<Item>(DATA);
-
-  initialSelection = [];
-  allowMultiSelect = true;
-  selection = new SelectionModel<Item>(
-    this.allowMultiSelect,
-    this.initialSelection
-  );
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
-
+  // This is for the checkboxes
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
     return numSelected == numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  // Selects all rows if they are not all selected; otherwise clear selection
   toggleAllRows() {
     this.isAllSelected()
       ? this.selection.clear()
