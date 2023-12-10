@@ -157,7 +157,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   statuses: string[] = ['All', ...new Set(DATA.map(item => item.status))];
   borrowers: string[] = ['All', ...new Set(DATA.map(item => item.borrower))];
   defaultValue: string = 'All';
-  itemsFilters: ItemsFilters[] = [];
+  columnsFilters: ItemsFilters[] = [];
 
   filterDictionary = new Map<string, string>();
 
@@ -192,17 +192,17 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     );
 
     //This is for the filter dropdowns, define the filter options here
-    this.itemsFilters.push({
+    this.columnsFilters.push({
       name: 'category',
       options: this.categories,
       defaultValue: this.defaultValue,
     });
-    this.itemsFilters.push({
+    this.columnsFilters.push({
       name: 'status',
       options: this.statuses,
       defaultValue: this.defaultValue,
     });
-    this.itemsFilters.push({
+    this.columnsFilters.push({
       name: 'borrower',
       options: this.borrowers,
       defaultValue: this.defaultValue,
@@ -218,7 +218,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   //this is for the search bar's autocomplete
   private _filter(value: string): string[] {
     if (value) {
-      this.itemsFilters.forEach(filter => {
+      this.columnsFilters.forEach(filter => {
         filter.defaultValue = 'All';
       });
     }
@@ -231,7 +231,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   }
 
   //this is for the search bar immediate filtering when typing
-  applyFilter(event: Event) {
+  applySearchFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value
       .trim()
       .toLowerCase();
@@ -249,7 +249,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     // and the search bar will be reset to empty
 
     //THIS IS THE DEFAULT IMPLEMENTATION OF THE FILTER PREDICATE
-    //I DEFINE IT IN BOTH applyFilter() AND applyItemsFilters()
+    //I DEFINE IT IN BOTH applySearchFilter() AND applyColumnsFilter()
     //SO THAT BOTH CAN BE USED (INDEPENDENTLY)!!
     //P.S.: Yes, I am a genius (((; - David
     this.dataSource.filterPredicate = (data, filter) => {
@@ -280,7 +280,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
 
 
   //this is for the columns filters
-  applyItemsFilters(ob: MatSelectChange, itemsfilters: ItemsFilters) {
+  applyColumnsFilter(ob: MatSelectChange, columnsfilter: ItemsFilters) {
     //reset the data structure
     this.filterDictionary.clear();
 
@@ -300,7 +300,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
       return isMatch;
     };
 
-    this.filterDictionary.set(itemsfilters.name, ob.value);
+    this.filterDictionary.set(columnsfilter.name, ob.value);
     var jsonString = JSON.stringify(
       Array.from(this.filterDictionary.entries())
     );

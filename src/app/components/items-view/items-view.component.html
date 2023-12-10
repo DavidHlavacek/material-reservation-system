@@ -24,7 +24,7 @@
       matInput
       [formControl]="myControl"
       [matAutocomplete]="auto"
-      (keyup)="applyFilter($event)" />
+      (keyup)="applySearchFilter($event)" />
 
     <!-- Auto-complete from all items names -->
     <mat-autocomplete #auto="matAutocomplete">
@@ -35,12 +35,12 @@
   </mat-form-field>
 
   <!-- Columns Filter -->
-  <mat-form-field appearance="fill" *ngFor="let itemsfilters of itemsFilters">
-    <mat-label>{{ itemsfilters.name }}</mat-label>
+  <mat-form-field appearance="fill" *ngFor="let columnsfilter of columnsFilters">
+    <mat-label>{{ columnsfilter.name }}</mat-label>
     <mat-select
-      [(value)]="itemsfilters.defaultValue"
-      (selectionChange)="applyItemsFilters($event, itemsfilters)">
-      <mat-option *ngFor="let op of itemsfilters.options" [value]="op">
+      [(value)]="columnsfilter.defaultValue"
+      (selectionChange)="applyColumnsFilter($event, columnsfilter)">
+      <mat-option *ngFor="let op of columnsfilter.options" [value]="op">
         {{ op }}
       </mat-option>
     </mat-select>
