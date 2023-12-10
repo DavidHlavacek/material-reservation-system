@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from './components/layout/layout.component';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
+import { HttpClientModule } from '@angular/common/http';
+// if you use services just import this
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, LayoutComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, LayoutComponent, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

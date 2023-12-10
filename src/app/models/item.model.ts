@@ -1,1 +1,3 @@
-export class Item {}
+export class Item {
+  name: any;
+}
