@@ -12,113 +12,18 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
+import {MatDividerModule} from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
-import { Item } from '../../models/Item';
 import { MatSelectChange } from '@angular/material/select';
-
+import {MatButtonModule} from '@angular/material/button';
+import { ItemService } from '../../services/item.service';
+import { Item } from '../../models/Item';
 // Dummy data for testing purposes
-const DATA: Item[] = [
-  {
-    itemID: 1,
-    name: 'Portable Workhorse',
-    category: 'Laptop',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 2,
-    name: 'Data Traveler',
-    category: 'USB',
-    status: 'Rented Out',
-    dateReserved: '25/12/2023',
-    borrower: 'James Williams',
-  },
-  {
-    itemID: 3,
-    name: 'Tech Maverick',
-    category: 'Laptop',
-    status: 'Damaged',
-    dateReserved: '25/11/2023',
-    borrower: 'Robert Smith',
-  },
-  {
-    itemID: 4,
-    name: 'Sleek Companion',
-    category: 'Laptop',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 5,
-    name: 'Data Guardian',
-    category: 'USB',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 6,
-    name: 'Digital Nomad',
-    category: 'Laptop',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 7,
-    name: 'Presentation Maestro',
-    category: 'Projector',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 8,
-    name: 'Visual Innovator',
-    category: 'Projector',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 9,
-    name: 'Sound Pioneer',
-    category: 'Speaker',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 10,
-    name: 'Elite Companion',
-    category: 'Laptop',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 11,
-    name: 'Audio Maestro',
-    category: 'Microphone',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-  {
-    itemID: 12,
-    name: 'Capture Pro',
-    category: 'Camera',
-    status: 'Available',
-    dateReserved: 'N/A',
-    borrower: 'N/A',
-  },
-];
 
 //name of the filter, options for the filter, default value of the filter which is always "All"
-export interface ItemsFilters {
+export interface ColumnsFilter {
   name: string;
+  field: string;
   options: string[];
   defaultValue: string;
 }
@@ -141,107 +46,175 @@ export interface ItemsFilters {
     ReactiveFormsModule,
     MatInputModule,
     MatSelectModule,
+    MatButtonModule,
+    MatDividerModule,
     AsyncPipe,
   ],
+  providers: [ItemService],
   templateUrl: './items-view.component.html',
   styleUrl: './items-view.component.css',
 })
 export class ItemsComponent implements AfterViewInit, OnInit {
   myControl = new FormControl('');
-  searchOptions: string[] = DATA.map(item => item.name);
+  searchOptions: string[];
   searchFilteredOptions!: Observable<string[]>;
 
-  //Set is used to remove duplicates
-  //This is to populate the filter options that are displayed in the dropdown, gave example above in the interface
-  categories: string[] = ['All', ...new Set(DATA.map(item => item.category))]; 
-  statuses: string[] = ['All', ...new Set(DATA.map(item => item.status))];
-  borrowers: string[] = ['All', ...new Set(DATA.map(item => item.borrower))];
+  categories: string[];
+  statuses: string[];
+  borrowers: string[];
   defaultValue: string = 'All';
-  columnsFilters: ItemsFilters[] = [];
+  columnsFilter: ColumnsFilter[] = [];
 
   filterDictionary = new Map<string, string>();
 
   columnsToDisplay: string[] = [
     'select',
-    'itemID',
-    'name',
-    'category',
-    'status',
-    'dateReserved',
-    'borrower',
+    'ItemID',
+    'Name',
+    'CategoryName',
+    'Status',
+    'DateReserved',
+    'Borrower',
   ];
-
-  dataSource = new MatTableDataSource<Item>(DATA);
 
   initialSelection = [];
   allowMultiSelect = true;
   selection = new SelectionModel<Item>(
     this.allowMultiSelect,
-    this.initialSelection
+    this.initialSelection,
   );
+
+  dataSource = new MatTableDataSource<Item>();
+  items: Item[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  constructor(private itemService: ItemService) {
+    this.searchOptions = [];
+    this.categories = [];
+    this.statuses = [];
+    this.borrowers = [];
 
-  ngOnInit() {
+    this.searchFilteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => this._filter(value || '')),
+    );
+  }
+
+  //await fetch otherwise filter options won't be populated
+  //and other bugs
+  async ngOnInit() {
+    await this.getItemsFromBackend();
+    await this.initializeFilters();
+
+    //This is for the pagination and sorting
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
     //This is for the search bar
     this.searchFilteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value || ''))
+      map((value: any) => this._filter(value || '')),
     );
 
     //This is for the filter dropdowns, define the filter options here
-    this.columnsFilters.push({
-      name: 'category',
-      options: this.categories,
-      defaultValue: this.defaultValue,
-    });
-    this.columnsFilters.push({
-      name: 'status',
-      options: this.statuses,
-      defaultValue: this.defaultValue,
-    });
-    this.columnsFilters.push({
-      name: 'borrower',
-      options: this.borrowers,
-      defaultValue: this.defaultValue,
-    });
   }
 
-  //This is for the pagination and sorting
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  ngAfterViewInit(): void {}
+
+  async getItemsFromBackend(): Promise<void> {
+    try {
+      const data: any = await this.itemService.getItems().toPromise();
+      this.items = data;
+      this.dataSource = new MatTableDataSource<Item>(this.items);
+      console.log('Items from the backend:', this.items);
+    } catch (error: any) {
+      console.error('Error fetching items from the backend:', error);
+    }
+  }
+
+  async initializeFilters(): Promise<void> {
+    // Populate filter options after fetching data
+
+    //Set is used to remove duplicates
+    //This is to populate the filter options that are displayed
+    //in the dropdown, gave example above in the interface
+    this.searchOptions = this.items.map((item: Item) => item.Name);
+    this.categories = [
+      'All',
+      ...new Set(this.items.map((item: Item) => item.CategoryName)),
+    ];
+    this.statuses = [
+      'All',
+      ...new Set(this.items.map((item: Item) => item.Status)),
+    ];
+    this.borrowers = [
+      'All',
+      ...new Set(
+        this.items
+          .map((item: Item) => item.Borrower) // Extract Borrower values
+          .filter(
+            (borrower: string | undefined | null): borrower is string =>
+              borrower !== undefined && borrower !== null && borrower !== '',
+          ), // Filter out undefined, null, and empty string values
+      ),
+    ];
+
+    this.columnsFilter = [
+      {
+        name: 'Category',
+        field: 'CategoryName',
+        options: this.categories,
+        defaultValue: this.defaultValue,
+      },
+      {
+        name: 'Status',
+        field: 'Status',
+        options: this.statuses,
+        defaultValue: this.defaultValue,
+      },
+      {
+        name: 'Borrower',
+        field: 'Borrower',
+        options: this.borrowers,
+        defaultValue: this.defaultValue,
+      },
+    ];
   }
 
   //this is for the search bar's autocomplete
   private _filter(value: string): string[] {
     if (value) {
-      this.columnsFilters.forEach(filter => {
+      this.columnsFilter.forEach((filter) => {
         filter.defaultValue = 'All';
       });
     }
 
     const filterValue = value.toLowerCase();
 
-    return this.searchOptions.filter(searchOptions =>
-      searchOptions.toLowerCase().includes(filterValue)
+    return this.searchOptions.filter((searchOptions) =>
+      searchOptions.toLowerCase().includes(filterValue),
     );
   }
 
   //this is for the search bar immediate filtering when typing
   applySearchFilter(event: Event) {
+    //reset the data structure of the other filter here
+    //so that when you go back to column filtering
+    //there isn't one already preset
+    //(broke my brain for a couple hours)
+    this.filterDictionary.clear();
+
     const filterValue = (event.target as HTMLInputElement).value
       .trim()
       .toLowerCase();
 
     // Reset filterPredicate to default
     // filterPredicate is a function that defines how to filter,
-    // it is different for the search bar, and different for the columns filter, 
-    // so I have to reset it and redefine it 
+    // it is different for the search bar, and different for the columns filter,
+    // so I have to reset it and redefine it
     // depending on what the user chooses to filter with
-    // SO, if the user starts typing in the search bar, 
+    // SO, if the user starts typing in the search bar,
     // the filterPredicate will be set to this,
     // and the columnns filters all reset to "All"
     // and vice versa, if the user chooses a column filter,
@@ -257,7 +230,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
       const dataStr = Object.keys(data)
         .reduce((currentTerm: string, key: string) => {
           // VVV This is from the documentation VVV
-          
+
           // Use an obscure Unicode character to delimit the words in the concatenated string.
           // This avoids matches where the values of two columns combined will match the user's query
           // (e.g. `Flute` and `Stop` will match `Test`). The character is intended to be something
@@ -278,12 +251,8 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.dataSource.filter = filterValue;
   }
 
-
   //this is for the columns filters
-  applyColumnsFilter(ob: MatSelectChange, columnsfilter: ItemsFilters) {
-    //reset the data structure
-    this.filterDictionary.clear();
-
+  applyColumnsFilter(ob: MatSelectChange, columnsfilter: ColumnsFilter) {
     this.myControl.setValue('');
 
     //THIS IS THE SECOND CUSTOM IMPLEMENTATION OF THE FILTER PREDICATE
@@ -300,11 +269,32 @@ export class ItemsComponent implements AfterViewInit, OnInit {
       return isMatch;
     };
 
-    this.filterDictionary.set(columnsfilter.name, ob.value);
+    this.filterDictionary.set(columnsfilter.field, ob.value);
     var jsonString = JSON.stringify(
-      Array.from(this.filterDictionary.entries())
+      Array.from(this.filterDictionary.entries()),
     );
     this.dataSource.filter = jsonString;
+  }
+
+  resetFilters() {
+    this.filterDictionary.clear();
+    this.myControl.setValue('');
+    this.dataSource.filterPredicate = (data, filter) => {
+      const dataStr = Object.keys(data)
+        .reduce((currentTerm: string, key: string) => {
+          return currentTerm + (data as { [key: string]: any })[key] + '◬';
+        }, '')
+        .toLowerCase();
+  
+      const transformedFilter = filter.trim().toLowerCase();
+  
+      return dataStr.indexOf(transformedFilter) !== -1;
+    };
+    this.columnsFilter.forEach((filter) => {
+      filter.defaultValue = 'All';
+    });
+    this.dataSource.filter = '';
+    console.log("RESET THAT SHIT");
   }
 
   // This is for the checkboxes
@@ -318,6 +308,6 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   toggleAllRows() {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.data.forEach(row => this.selection.select(row));
+      : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
 }

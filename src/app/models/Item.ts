@@ -1,8 +1,11 @@
+// models/Item.ts
+
 export interface Item {
-    itemID: number;
-    name: string;
-    category: string;
-    status: string;
-    dateReserved: string;
-    borrower: string;
-  }
+  ItemID: number;
+  CategoryName: string;
+  BarcodeID: number;
+  Name: string;
+  Status: string;
+  Borrower?: string; // Make it optional
+  DateReserved?: Date; // Make it optional
+}

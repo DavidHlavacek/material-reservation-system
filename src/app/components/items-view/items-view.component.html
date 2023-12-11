@@ -24,7 +24,8 @@
       matInput
       [formControl]="myControl"
       [matAutocomplete]="auto"
-      (keyup)="applySearchFilter($event)" />
+      (keyup)="applySearchFilter($event)"
+    />
 
     <!-- Auto-complete from all items names -->
     <mat-autocomplete #auto="matAutocomplete">
@@ -35,17 +36,34 @@
   </mat-form-field>
 
   <!-- Columns Filter -->
-  <mat-form-field appearance="fill" *ngFor="let columnsfilter of columnsFilters">
+  <mat-form-field
+    appearance="fill"
+    *ngFor="let columnsfilter of columnsFilter"
+  >
     <mat-label>{{ columnsfilter.name }}</mat-label>
     <mat-select
       [(value)]="columnsfilter.defaultValue"
-      (selectionChange)="applyColumnsFilter($event, columnsfilter)">
+      (selectionChange)="applyColumnsFilter($event, columnsfilter)"
+    >
       <mat-option *ngFor="let op of columnsfilter.options" [value]="op">
         {{ op }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 </form>
+<form>
+  
+  <button mat-raised-button (click)="resetFilters()" style="background-color:var(--mdc-protected-button-disabled-container-color)">
+    Reset Filters
+  </button>
+  &nbsp;
+  <button mat-raised-button style="background-color:#8bc34a" (click)="resetFilters()">
+    Add Item
+  </button>
+</form>
+<br />
+<mat-divider></mat-divider>
+<br />
 
 <!--  Table -->
 <div class="container">
@@ -56,42 +74,45 @@
         <mat-checkbox
           (change)="$event ? toggleAllRows() : null"
           [checked]="selection.hasValue() && isAllSelected()"
-          [indeterminate]="selection.hasValue() && !isAllSelected()">
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+        >
         </mat-checkbox>
       </th>
       <td mat-cell *matCellDef="let row">
         <mat-checkbox
           (click)="$event.stopPropagation()"
           (change)="$event ? selection.toggle(row) : null"
-          [checked]="selection.isSelected(row)">
+          [checked]="selection.isSelected(row)"
+        >
         </mat-checkbox>
       </td>
     </ng-container>
     <!-- Define the columns -->
-    <ng-container matColumnDef="itemID">
+    <ng-container matColumnDef="ItemID">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Item ID</th>
-      <td mat-cell *matCellDef="let item">{{ item.itemID }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.ItemID }}</td>
     </ng-container>
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="Name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-      <td mat-cell *matCellDef="let item">{{ item.name }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.Name }}</td>
     </ng-container>
-    <ng-container matColumnDef="category">
+    <ng-container matColumnDef="CategoryName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-      <td mat-cell *matCellDef="let item">{{ item.category }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.CategoryName }}</td>
     </ng-container>
-    <ng-container matColumnDef="status">
+    <ng-container matColumnDef="Status">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-      <td mat-cell *matCellDef="let item">{{ item.status }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.Status }}</td>
     </ng-container>
-    <ng-container matColumnDef="dateReserved">
+    <ng-container matColumnDef="DateReserved">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Reserved</th>
-      <td mat-cell *matCellDef="let item">{{ item.dateReserved }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.DateReserved || "/" }}</td>
     </ng-container>
-    <ng-container matColumnDef="borrower">
+    <ng-container matColumnDef="Borrower">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Borrower</th>
-      <td mat-cell *matCellDef="let item">{{ item.borrower }}</td>
+      <td mat-cell *matCellDef="let item">{{ item.Borrower || "/" }}</td>
     </ng-container>
+
     <!-- You need to define what columns to display!! Including Select for the checkboxes -->
     <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
     <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
@@ -100,6 +121,7 @@
   <mat-paginator
     [pageSizeOptions]="[5, 10, 20]"
     showFirstLastButtons
-    aria-label="Select page of periodic elements">
+    aria-label="Select page of periodic elements"
+  >
   </mat-paginator>
 </div>
