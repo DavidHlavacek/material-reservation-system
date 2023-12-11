@@ -13,3 +13,12 @@ mat-table {
 .mat-column-select {
     overflow: initial;
   }
+
+  /* Add this to your component's styles or styles.scss file */
+.sticky-search-input {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  

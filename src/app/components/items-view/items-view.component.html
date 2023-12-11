@@ -22,7 +22,7 @@
       placeholder="Search..."
       aria-label="Number"
       matInput
-      [formControl]="myControl"
+      [formControl]="searchControl"
       [matAutocomplete]="auto"
       (keyup)="applySearchFilter($event)"
     />
@@ -43,7 +43,7 @@
       (selectionChange)="applyColumnsFilter($event, columnsfilter)"
       (closed)="resetSelectSearch(columnsfilter)"
     >
-      <mat-form-field>
+      <mat-form-field class="sticky-search-input">
         <input
           matInput
           [formControl]="selectControl"

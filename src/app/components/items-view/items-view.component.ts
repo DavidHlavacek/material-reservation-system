@@ -52,7 +52,7 @@ export interface ColumnsFilter {
   styleUrl: './items-view.component.css',
 })
 export class ItemsComponent implements AfterViewInit, OnInit {
-  myControl = new FormControl('');
+  searchControl = new FormControl('');
   selectControl = new FormControl('');
 
   searchOptions!: string[];
@@ -94,16 +94,16 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.initializeOptions();
   }
 
-  ngOnInit() {
-    this.initializeData();
-    this.initializeFilters();
+  async ngOnInit() {
+    await this.getItemsFromBackend();
+    await this.initializeFilters();
     this.configureDataTable();
   }
 
   ngAfterViewInit(): void {}
 
   private initializeFormControls(): void {
-    this.myControl = new FormControl('');
+    this.searchControl = new FormControl('');
     this.selectControl = new FormControl('');
   }
 
@@ -113,20 +113,16 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.statuses = [];
     this.borrowers = [];
 
-    this.searchFilteredOptions = this.myControl.valueChanges.pipe(
+    this.searchFilteredOptions = this.searchControl.valueChanges.pipe(
       startWith(''),
       map((value: any) => this._filter(value || '')),
     );
   }
 
-  private async initializeData(): Promise<void> {
-    await this.getItemsFromBackend();
-  }
-
   private configureDataTable(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.searchFilteredOptions = this.myControl.valueChanges.pipe(
+    this.searchFilteredOptions = this.searchControl.valueChanges.pipe(
       startWith(''),
       map((value: any) => this._filter(value || '')),
     );
@@ -220,10 +216,6 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     );
   }
 
-  resetFormControl(control: FormControl): void {
-    control.setValue('');
-  }
-
   // This function applies the search filter when typing in the main search bar.
   applySearchFilter(event: Event) {
     //reset the data structure of the other filter here
@@ -266,10 +258,10 @@ export class ItemsComponent implements AfterViewInit, OnInit {
 
     this.dataSource.filter = filterValue;
   }
-
+  
   // This function applies the filter for column dropdowns.
   applyColumnsFilter(ob: MatSelectChange, columnsfilter: ColumnsFilter) {
-    this.resetFormControl(this.myControl);
+    this.resetFormControl(this.searchControl);
     //THIS IS THE SECOND CUSTOM IMPLEMENTATION OF THE FILTER PREDICATE
     //TO MAKE THE COLUMNS FILTERS WORK!!!!
     this.dataSource.filterPredicate = function (record, filter) {
@@ -290,25 +282,17 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     );
     this.dataSource.filter = jsonString;
   }
+  
+  resetFormControl(control: FormControl): void {
+    control.setValue('');
+  }
 
   // This function resets all filters.
   resetFilters() {
     this.filterDictionary.clear();
-    this.resetFormControl(this.myControl);
-    this.dataSource.filterPredicate = (data, filter) => {
-      const dataStr = Object.keys(data)
-        .reduce((currentTerm: string, key: string) => {
-          return currentTerm + (data as { [key: string]: any })[key] + '◬';
-        }, '')
-        .toLowerCase();
-
-      const transformedFilter = filter.trim().toLowerCase();
-
-      return dataStr.indexOf(transformedFilter) !== -1;
-    };
+    this.resetFormControl(this.searchControl);
     this.resetColumnsFilterDefaults();
     this.dataSource.filter = '';
-    console.log('RESET THAT SHIT');
   }
 
   resetSelectSearch(columnsfilter: ColumnsFilter) {
