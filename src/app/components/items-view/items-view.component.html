@@ -36,28 +36,45 @@
   </mat-form-field>
 
   <!-- Columns Filter -->
-  <mat-form-field
-    appearance="fill"
-    *ngFor="let columnsfilter of columnsFilter"
-  >
+  <mat-form-field appearance="fill" *ngFor="let columnsfilter of columnsFilter">
     <mat-label>{{ columnsfilter.name }}</mat-label>
     <mat-select
       [(value)]="columnsfilter.defaultValue"
       (selectionChange)="applyColumnsFilter($event, columnsfilter)"
+      (closed)="resetSelectSearch(columnsfilter)"
+      
     >
-      <mat-option *ngFor="let op of columnsfilter.options" [value]="op">
+      <mat-form-field>
+        <input
+          matInput
+          [formControl]="selectControl"
+          placeholder="Search..."
+          (keyup.space)="$event.preventDefault()"
+          (keyup)="selectSearchOnKey($event.target, columnsfilter)"
+        />
+      </mat-form-field>
+      <mat-option *ngFor="let op of columnsfilter.selectedOptions" [value]="op">
         {{ op }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 </form>
 <form>
-  
-  <button mat-raised-button (click)="resetFilters()" style="background-color:var(--mdc-protected-button-disabled-container-color)">
+  <button
+    mat-raised-button
+    (click)="resetFilters()"
+    style="
+      background-color: var(--mdc-protected-button-disabled-container-color);
+    "
+  >
     Reset Filters
   </button>
   &nbsp;
-  <button mat-raised-button style="background-color:#8bc34a" (click)="resetFilters()">
+  <button
+    mat-raised-button
+    style="background-color: #8bc34a"
+    (click)="resetFilters()"
+  >
     Add Item
   </button>
 </form>
