@@ -2,6 +2,8 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {RouterModule} from '@angular/router';
+
 
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -45,6 +47,7 @@ export interface ColumnsFilter {
     MatSelectModule,
     MatButtonModule,
     MatDividerModule,
+    RouterModule,
     AsyncPipe,
   ],
   providers: [ItemService],

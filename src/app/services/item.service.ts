@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Item } from '../models/Item';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,13 @@ export class ItemService {
 
   getItems(): Observable<any> {
     return this.http.get(this.apiUrl);
+  }
+
+  createItem(item: Item): Observable<any> {
+    console.log('Sending item:', item); // Add this line
+
+    const headers = { 'Content-Type': 'application/json' };
+    return this.http.post<any>(this.apiUrl, item, { headers });
   }
 }
 

@@ -1,1 +1,51 @@
-<p>create-item-view works!</p>
+<!-- create-item-view.component.html -->
+<button routerLink="/items/show-items" mat-raised-button color="primary">
+  Back To Items
+</button>
+<br />
+<br />
+<form (ngSubmit)="onSubmit(item)">
+  <div>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="item.Name" name="name" />
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field>
+      <mat-label>Category</mat-label>
+      <mat-select
+        [(ngModel)]="item.CategoryName"
+        name="category"
+        (closed)="resetSelectSearch()"
+      >
+        <mat-form-field class="sticky-search-input">
+          <input
+            matInput
+            [formControl]="selectControl"
+            placeholder="Search..."
+            (keyup.space)="$event.preventDefault()"
+            (keyup)="selectSearchOnKey($event.target)"
+          />
+        </mat-form-field>
+        <mat-option *ngFor="let category of selectedOptions" [value]="category.CategoryName">{{
+          category.CategoryName
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="item.Status" name="status" value="Issued">
+        <mat-option value="Issued">Issued</mat-option>
+        <mat-option value="Not issued">Not issued</mat-option>
+        <mat-option value="Not returned">Not returned</mat-option>
+        <mat-option value="Damaged">Damaged</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <button type="submit" mat-raised-button color="primary">Create Item</button>&nbsp;
+</form>
+<br/>
+<button (click)="createCategoryDialog()" mat-raised-button color="primary">Create Category</button>

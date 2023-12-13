@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Create Category</h1>
+<div mat-dialog-content>
+  <div>
+    <mat-form-field>
+      <mat-label>Category</mat-label>
+      <input matInput for="Category" name="CategoryName" id="CategoryName" [(ngModel)]="data.CategoryName" />
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput for="Description" name="Description" id="Description" [(ngModel)]="data.Description" placeholder="Describe the category..."></textarea>
+    </mat-form-field>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" cdkFocusInitial [mat-dialog-close]="data">
+    Create Category
+  </button>
+  <button mat-raised-button mat-dialog-close (onClick)="onNoClick()">Cancel</button>
+</div>
