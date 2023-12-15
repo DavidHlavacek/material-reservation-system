@@ -4,6 +4,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import {
   Form,
   FormControl,
@@ -27,6 +28,7 @@ import { CreateCategoryDialogComponent } from '../create-category-dialog/create-
     MatFormFieldModule,
     FormsModule,
     RouterModule,
+    MatButtonModule,
     ReactiveFormsModule,
   ],
   providers: [CategoryService, ItemService],

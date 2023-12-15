@@ -28,9 +28,11 @@
             (keyup)="selectSearchOnKey($event.target)"
           />
         </mat-form-field>
-        <mat-option *ngFor="let category of selectedOptions" [value]="category.CategoryName">{{
-          category.CategoryName
-        }}</mat-option>
+        <mat-option
+          *ngFor="let category of selectedOptions"
+          [value]="category.CategoryName"
+          >{{ category.CategoryName }}</mat-option
+        >
       </mat-select>
     </mat-form-field>
   </div>
@@ -45,7 +47,14 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <button type="submit" mat-raised-button color="primary">Create Item</button>&nbsp;
+  <div mat-dialog-actions>
+    <button mat-raised-button type="submit" color="primary">Create Item</button
+    >&nbsp;
+  </div>
 </form>
-<br/>
-<button (click)="createCategoryDialog()" mat-raised-button color="primary">Create Category</button>
+<br />
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="createCategoryDialog()">
+    Create Category
+  </button>
+</div>
