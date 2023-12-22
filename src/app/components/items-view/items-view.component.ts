@@ -136,7 +136,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
       const data: any = await this.itemService.getItems().toPromise();
       this.items = data;
       this.dataSource = new MatTableDataSource<Item>(this.items);
-      console.log('Items from the backend:', this.items);
+      console.log('Items from backend:', this.items);
     } catch (error: any) {
       console.error('Error fetching items from the backend:', error);
     }
