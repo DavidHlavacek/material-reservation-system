@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS materialreservation;
+USE materialreservation;
+
 CREATE TABLE `Admin` (
   `AdminID` int(11) NOT NULL,
   `Email` varchar(255) NOT NULL,
