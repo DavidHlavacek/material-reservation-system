@@ -1,16 +1,19 @@
-<mat-form-field>
-    <mat-label><img src="../../../assets/profileImg.png"> Open Sidebar</mat-label>
-    <mat-select #mode value="side">
-      <mat-option value="scan" (click)="navigateTo('/')"><img src="../../../assets/barcodeImg.png"> Scan Barcode</mat-option>
-      <mat-option value="lend"(click)="navigateTo('/')"><img src="../../../assets/productImg.png"> Lend Materials</mat-option>
-      <mat-option value="return"(click)="navigateTo('/')"><img src="../../../assets/returnImg.png"> Return Items</mat-option>
-      <mat-option value="categories"(click)="navigateTo('/')"><img src="../../../assets/categoryImg.png"> Categories</mat-option>
-      <mat-option value="borrowers"(click)="navigateTo('/')"><img src="../../../assets/borrowersImg.png"> Borrowers</mat-option>
-      <mat-option value="user"(click)="navigateTo('/')"><img src="../../../assets/userImg.png"> User</mat-option>
-      <mat-option value="reserve"(click)="navigateTo('/')"><img src="../../../assets/reservationImg.png"> Reservations</mat-option>
-    </mat-select>
-</mat-form-field>
+<mat-sidenav-container class="sidebarContainer">
+  <mat-sidenav #sidenav disableClose>
+    <p><button mat-button (click)="close('toggle button')">X</button></p>
+    <mat-nav-list>
+      <a mat-list-item routerLink="."><img src="../../../assets/barcodeImg.png"> Scan Barcode</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/productImg.png"> Lend Materials</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/returnImg.png"> Return Items</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/categoryImg.png"> Categories</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/borrowersImg.png"> Borrowers</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/userImg.png"> User</a>
+      <a mat-list-item routerLink="."><img src="../../../assets/reservationImg.png"> Reservations</a>
+    </mat-nav-list>
+  </mat-sidenav>
 
-<!-- Why are you using forms ? 
-  Check the video I sent in the group for creating a sidebar
-   or the documentation on Angular Material -->
+  <mat-sidenav-content>
+    <p><button mat-button (click)="sidenav.open()">Name</button></p>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
