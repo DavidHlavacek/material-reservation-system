@@ -1,12 +1,31 @@
-<!-- barcode-generator.component.html -->
-<div>
-    <label>Email:</label>
-    <input type="text" #emailInput />
-  </div>
-  <div>
-    <button (click)="generateBarcode()">Generate Barcode</button>
-  </div>
-  <div>
-    <canvas id="mycanvas"></canvas>
-  </div>
-  
+<br>
+
+<h2 class="brandname">Angular</h2>
+
+<br>
+
+<!-- Input field for the string -->
+<label for="inputString">Enter String:</label>
+<input type="text" id="inputString" name="inputString" [(ngModel)]="inputString" (input)="updateBarcode()">
+
+<!-- Submit button to generate barcode -->
+<button (click)="generateBarcode()">Generate Barcode</button>
+
+
+<tr *ngFor="let PS of PrintSerials">
+	<ngx-barcode6 [bc-value]="PS.SerialId" [bc-display-value]="true"></ngx-barcode6>
+</tr>
+
+<div id="lotarea">
+	<div class="lotnumber">
+		<span *ngIf="isChecked">L</span> <span #dayOfTheYear></span>
+	</div>
+	<span class="ddate">{{ date | date: 'MMM d, y, HH:m:s' }}</span>
+
+	<div id="content">
+		<!-- Pass the inputString to the barcodeValue method -->
+		<ngx-barcode6 [bc-value]="barcodeValue" [bc-display-value]="true"></ngx-barcode6>
+	</div>
+
+	<br>
+</div>

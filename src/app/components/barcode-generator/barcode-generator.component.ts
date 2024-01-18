@@ -1,43 +1,81 @@
-// barcode-generator.component.ts
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef, Renderer2,NgModule } from '@angular/core';
 
-// Declare bwipjs as any to avoid TypeScript issues
-declare var bwipjs: any;
+//import { AppComponent } from '../../app.component';
+
+import { NgxBarcode6Module } from 'ngx-barcode6';
+import { BrowserModule } from '@angular/platform-browser';
+//import {} from '@angular/animations';
+//import {} from '@angular/cdk';
+import { FormsModule } from '@angular/forms';
+//import {} from '@angular/material';
+//import {} from '@angular/platform-browser';
+//import {} from '@angular/platform-browser-dynamic';
+//import {} from '@angular/router';
+import 'core-js/actual';
+//import {} from 'rxjs';
+
 
 @Component({
-  selector: 'app-barcode-generator',
+  selector: 'my-app',
+  standalone: true,
+  imports: [BrowserModule, FormsModule, NgxBarcode6Module],
   templateUrl: './barcode-generator.component.html',
   styleUrls: ['./barcode-generator.component.css'],
 })
-export class BarcodeGeneratorComponent implements OnInit {
-  @ViewChild('emailInput', { static: true }) emailInput!: ElementRef;
+export class BarcodeGeneratorComponent {
+  date: Date = new Date(); // Assign a default value to date
+  yrs: string = ''; // Assign a default value to yrs
+  isChecked: boolean = false; // Property to track checkbox state
+  inputString: string = ''; // New property to store user-entered string
+  barcodeValue: string = ''; // Property to store the generated barcode
+  PrintSerials: any[] = []; // Property for PrintSerials array
 
-  barcodeData: string = '';
+  @ViewChild('dayOfTheYear') dayOfTheYear!: ElementRef; // Use "!" to tell TypeScript that it will be initialized later
 
-  ngOnInit() {
-    // Initialize bwip-js
-    bwipjs('canvas', {}, () => {});
+  constructor(private renderer: Renderer2) {
+    // Initialize PrintSerials with sample data or load it from a service
+    this.PrintSerials = [
+      { SerialId: '12345' },
+      { SerialId: '67890' },
+      // ... other objects
+    ];
   }
 
+  ngAfterViewInit() {
+    const dayOfYear = this.calculateDayOfYear();
+    this.renderer.setProperty(
+      this.dayOfTheYear.nativeElement,
+      'innerHTML',
+      this.yrs + dayOfYear
+    );
+  }
+
+  private calculateDayOfYear(): number {
+    const timestmp = new Date().setFullYear(new Date().getFullYear(), 0, 1);
+    const yearFirstDay = Math.floor(timestmp / 86400000);
+    const today = Math.ceil(new Date().getTime() / 86400000);
+    return today - yearFirstDay;
+  }
+
+  // New method to handle input changes and update barcode
+  updateBarcode() {
+    // Recalculate barcode value when input changes
+    // This method is bound to the (input) event of the input field
+    this.generateBarcodeValue();
+  }
+
+  // Updated method to generate barcode on submit button click
   generateBarcode() {
-    const emailInputValue = this.emailInput.nativeElement.value;
+    // Generate the barcode and update the view
+    this.generateBarcodeValue();
+  }
 
-    if (emailInputValue) {
-      const enteredStringLength = emailInputValue.length;
-      const unixTime = Math.floor(new Date().getTime() / 1000);
+  private generateBarcodeValue() {
+    // Combine Unix time with string length and update the barcode value
+    const unixTime = Math.floor(new Date().getTime() / 1000);
+    this.barcodeValue = `${unixTime}${this.inputString.length}`;
 
-      // Concatenate email length and Unix time to create barcode data
-      this.barcodeData = enteredStringLength.toString() + unixTime.toString();
-
-      // Call the function to generate barcode using 'bwip-js'
-      bwipjs('mycanvas', {
-        bcid: 'code128',       // Barcode type
-        text: this.barcodeData, // Text to encode
-        scale: 3,              // 3x scaling factor
-        height: 10,            // Bar height, in millimeters
-      });
-    } else {
-      console.error('Email input is empty.');
-    }
+    // Log or use the barcodeValue as needed
+    console.log('Generated Barcode:', this.barcodeValue);
   }
 }
