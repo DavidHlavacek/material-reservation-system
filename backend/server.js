@@ -27,10 +27,11 @@ connection.connect((err) => {
 
 const itemsRoute = require('./routes/items')(connection);
 const categoriesRoute = require('./routes/categories')(connection);
+const borrowersRoute = require('./routes/borrowers')(connection);
 
 app.use('/api', itemsRoute); // Mount the 'items' route under '/api/items'
 app.use('/api', categoriesRoute); 
-
+app.use('/api', borrowersRoute);
 
 
 

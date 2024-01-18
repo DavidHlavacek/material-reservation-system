@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {RouterModule} from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 
 import { Observable } from 'rxjs';
@@ -21,6 +21,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 
 import { ItemService } from '../../services/item.service';
 import { Item } from '../../models/Item';
+import { EmailService } from '../../services/email.service';
+import { BorrowerService } from '../../services/borrower.service';
 
 export interface ColumnsFilter {
   name: string;
@@ -50,7 +52,7 @@ export interface ColumnsFilter {
     RouterModule,
     AsyncPipe,
   ],
-  providers: [ItemService],
+  providers: [ItemService, EmailService, BorrowerService],
   templateUrl: './items-view.component.html',
   styleUrl: './items-view.component.css',
 })
@@ -92,7 +94,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private itemService: ItemService) {
+  constructor(private itemService: ItemService, private emailService: EmailService, private borrowersService: BorrowerService) {
     this.initializeFormControls();
     this.initializeOptions();
   }
@@ -103,7 +105,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     this.configureDataTable();
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void { }
 
   private initializeFormControls(): void {
     this.searchControl = new FormControl('');
@@ -185,6 +187,36 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     };
   }
 
+  async sendReminder() {
+    const selectedItems = this.selection.selected;
+
+    for (const item of selectedItems) {
+      const borrower = item.Borrower;
+
+      if (borrower) {
+        // Fetch the borrower's email from the backend
+        try {
+          const response = await this.borrowersService.getBorrowerEmail(borrower).toPromise();
+          const borrowerEmail = response[0].Email; // Access the email property from the response
+          console.log(borrowerEmail);
+          // Now you have the borrower's email, you can use it to send the reminder
+          await this.emailService.sendReminder(borrowerEmail, item.Name);
+        } catch (error) {
+          console.error('Error fetching borrower email:', error);
+          // Handle error fetching email
+        }
+      }
+    }
+
+    // handle success or error cases here
+  }
+
+  // Add a method to check if any checkboxes are selected
+  isSendReminderButtonEnabled(): boolean {
+    return this.selection.hasValue();
+  }
+
+
   private _filter(value: string): string[] {
     if (value) {
       this.resetColumnsFilterDefaults();
@@ -261,7 +293,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
 
     this.dataSource.filter = filterValue;
   }
-  
+
   // This function applies the filter for column dropdowns.
   applyColumnsFilter(ob: MatSelectChange, columnsfilter: ColumnsFilter) {
     this.resetFormControl(this.searchControl);
@@ -285,7 +317,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
     );
     this.dataSource.filter = jsonString;
   }
-  
+
   resetFormControl(control: FormControl): void {
     control.setValue('');
   }
