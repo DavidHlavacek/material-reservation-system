@@ -1,7 +1,7 @@
 <mat-sidenav-container class="sidebarContainer">
   <mat-sidenav #sidenav disableClose>
     <p><button mat-button (click)="close('toggle button')">X</button></p>
-    <mat-list>
+    <mat-nav-list>
       <a mat-list-item routerLink="."><img src="../../../assets/barcodeImg.png"> Scan Barcode</a>
       <a mat-list-item routerLink="."><img src="../../../assets/productImg.png"> Lend Materials</a>
       <a mat-list-item routerLink="."><img src="../../../assets/returnImg.png"> Return Items</a>
@@ -9,11 +9,11 @@
       <a mat-list-item routerLink="."><img src="../../../assets/borrowersImg.png"> Borrowers</a>
       <a mat-list-item routerLink="."><img src="../../../assets/userImg.png"> User</a>
       <a mat-list-item routerLink="."><img src="../../../assets/reservationImg.png"> Reservations</a>
-    </mat-list>
+    </mat-nav-list>
   </mat-sidenav>
 
-  <mat-sidenav-content>
-    <p><button mat-button (click)="sidenav.open()">Name</button></p>
+  <mat-sidenav-content class="toggleButton">
+    <button mat-button (click)="sidenav.open()"><img src="../../../assets/profileImg.png"></button>
   </mat-sidenav-content>
 </mat-sidenav-container>
 

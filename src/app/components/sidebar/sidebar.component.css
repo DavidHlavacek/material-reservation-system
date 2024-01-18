@@ -1,8 +1,15 @@
 .sidebarContainer {
-  position: absolute;
+  background-color: white;
+  width: 12.5%;
+  height: 100%;
+  position: fixed;
   top: 0;
-  bottom: 0;
-  left: 0;
   right: 0;
-  width: 10%;
+  
+}
+
+.toggleButton{
+  margin-top: 0.5%;
+  margin-right: auto;
+  margin-top: auto;
 }
