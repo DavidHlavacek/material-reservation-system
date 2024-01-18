@@ -200,7 +200,7 @@ export class ItemsComponent implements AfterViewInit, OnInit {
           const borrowerEmail = response[0].Email; // Access the email property from the response
           console.log(borrowerEmail);
           // Now you have the borrower's email, you can use it to send the reminder
-          await this.emailService.sendReminder(borrowerEmail, item.Name);
+          await this.emailService.sendReminder(borrower, borrowerEmail, item.Name);
         } catch (error) {
           console.error('Error fetching borrower email:', error);
           // Handle error fetching email
