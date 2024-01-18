@@ -189,27 +189,31 @@ export class ItemsComponent implements AfterViewInit, OnInit {
 
   async sendReminder() {
     const selectedItems = this.selection.selected;
-
+  
     for (const item of selectedItems) {
       const borrower = item.Borrower;
-
+  
       if (borrower) {
-        // Fetch the borrower's email from the backend
         try {
           const response = await this.borrowersService.getBorrowerEmail(borrower).toPromise();
-          const borrowerEmail = response[0].Email; // Access the email property from the response
-          console.log(borrowerEmail);
-          // Now you have the borrower's email, you can use it to send the reminder
-          await this.emailService.sendReminder(borrower, borrowerEmail, item.Name);
+          const borrowerEmail = response[0].Email;
+  
+          await this.emailService.sendReminder(borrower, borrowerEmail, item.Name).toPromise();
+          console.log('Reminder sent successfully');
+  
+          // Show alert for each successful reminder
+          alert('Reminder sent successfully');
         } catch (error) {
-          console.error('Error fetching borrower email:', error);
-          // Handle error fetching email
+          console.error('Error fetching borrower email or sending reminder:', error);
+          alert('Error!');
+          // Handle error fetching email or sending reminder
         }
       }
     }
-
+  
     // handle success or error cases here
   }
+  
 
   // Add a method to check if any checkboxes are selected
   isSendReminderButtonEnabled(): boolean {

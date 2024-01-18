@@ -2,6 +2,7 @@ const mysql = require("mysql2");
 const express = require("express");
 var bodyParser = require('body-parser')
 const cors = require("cors");
+const { connect } = require("http2");
 const app = express();
 const port = 3000;
 
@@ -28,10 +29,14 @@ connection.connect((err) => {
 const itemsRoute = require('./routes/items')(connection);
 const categoriesRoute = require('./routes/categories')(connection);
 const borrowersRoute = require('./routes/borrowers')(connection);
+const emailRoute = require('./routes/mail')(connection); // Include the email route
+
 
 app.use('/api', itemsRoute); // Mount the 'items' route under '/api/items'
 app.use('/api', categoriesRoute); 
 app.use('/api', borrowersRoute);
+app.use('/api', emailRoute); // Mount the email route under '/api/send-email'
+
 
 
 
