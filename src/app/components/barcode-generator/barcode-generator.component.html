@@ -12,9 +12,6 @@
 <button (click)="generateBarcode()">Generate Barcode</button>
 
 
-<tr *ngFor="let PS of PrintSerials">
-	<ngx-barcode6 [bc-value]="PS.SerialId" [bc-display-value]="true"></ngx-barcode6>
-</tr>
 
 <div id="lotarea">
 	<div class="lotnumber">
@@ -22,7 +19,7 @@
 	</div>
 	<span class="ddate">{{ date | date: 'MMM d, y, HH:m:s' }}</span>
 
-	<div id="content">
+	<div id="content" *ngIf='barcodeValue'>
 		<!-- Pass the inputString to the barcodeValue method -->
 		<ngx-barcode6 [bc-value]="barcodeValue" [bc-display-value]="true"></ngx-barcode6>
 	</div>
