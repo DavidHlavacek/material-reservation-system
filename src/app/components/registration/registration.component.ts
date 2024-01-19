@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RegistrationService } from '../../services/registration.service';
 import { EmailService } from '../../services/email.service';
-
+import { BarcodeGeneratorComponent } from '../barcode-generator/barcode-generator.component';
+import { BarcodeGeneratorService } from '../../services/barcode-shared.service';
 
 
 
@@ -18,19 +19,28 @@ import { EmailService } from '../../services/email.service';
   styleUrls: ['./registration.component.css'],
 })
 
-export class RegistrationComponent {
+export class RegistrationComponent implements AfterViewInit {
   registrationForm: FormGroup;
   isRegistered: boolean = false;
+  inputString = '';
+
+  @ViewChild(BarcodeGeneratorComponent) barcodeGeneratorComponent!: BarcodeGeneratorComponent;
 
   constructor(
     private formBuilder: FormBuilder,
     private registrationService: RegistrationService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private barcodeGeneratorService: BarcodeGeneratorService
   ) {
     this.registrationForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       agreeTerms: [false, Validators.requiredTrue]
     });
+  }
+  ngAfterViewInit(): void {
+    throw new Error('Method not implemented.');
+    const generatedBarcode = this.barcodeGeneratorService.generateBarcodeValue('your-input-string');
+    console.log('Generated Barcode:', generatedBarcode);
   }
 
   register() {
@@ -60,12 +70,12 @@ export class RegistrationComponent {
               this.registrationService.registerEmail(email, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
-                  
+
                   // Generate barcode to the email
                   this.sendBarcodeByEmail(email, barcode);
                 },
                 error => {
-                  console.error('Error saving email to the database :', error);
+                  console.error('Error saving email to the database:', error);
                 }
               );
             }
@@ -87,7 +97,13 @@ export class RegistrationComponent {
 
   generateUniqueBarcode(): number {
     // barcode generation?
-    return 123456789;
+    const barcodeString = this.barcodeGeneratorService.generateBarcodeValue(this.inputString);
+
+    const barcodeValue = Number(barcodeString);
+
+    console.log('Generated Barcode:', barcodeValue);
+    
+    return barcodeValue;
   }
 
   async sendBarcodeByEmail(email: string, barcode: number) {
