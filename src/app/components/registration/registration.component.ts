@@ -13,7 +13,7 @@ import { Inject } from '@angular/core';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, BrowserModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   providers: [FormBuilder, HttpClient, RegistrationService, EmailService, BarcodeGeneratorService],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
@@ -52,10 +52,10 @@ export class RegistrationComponent implements AfterViewInit {
         const email = emailControl.value;
   
         // Check if email address is from nhl
-        // if (!this.isValidEmailDomain(email)) {
-        //   alert('Access denied. Please use a valid NHL Stenden email address.');
-        //   return;
-        // }
+        if (!this.isValidEmailDomain(email)) {
+          alert('Access denied. Please use a valid NHL Stenden email address.');
+          return;
+        }
   
         // Check if email is already registered
         this.registrationService.checkEmailExistence(email).subscribe(
