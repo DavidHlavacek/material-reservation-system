@@ -7,12 +7,13 @@ import { RegistrationService } from '../../services/registration.service';
 import { EmailService } from '../../services/email.service';
 import { BarcodeGeneratorComponent } from '../barcode-generator/barcode-generator.component';
 import { BarcodeGeneratorService } from '../../services/barcode-shared.service';
+import { Inject } from '@angular/core';
 
 
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, BrowserModule],
   providers: [FormBuilder, HttpClient, RegistrationService, EmailService, BarcodeGeneratorService],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
@@ -39,7 +40,6 @@ export class RegistrationComponent implements AfterViewInit {
   }
   ngAfterViewInit(): void {
     const generatedBarcode = this.barcodeGeneratorService.generateBarcodeValue('teeeest-ss-GAHAIHEF97979');
-    console.log('Generated Barcode:', generatedBarcode);
   }
 
   register() {
@@ -103,7 +103,6 @@ export class RegistrationComponent implements AfterViewInit {
   
     const barcodeValue = String(barcodeString);
   
-    console.log('Generated Barcode:', barcodeValue);
   
     return barcodeValue;
   }
