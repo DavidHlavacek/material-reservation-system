@@ -9,7 +9,6 @@ export class BarcodeGeneratorService {
     // Combine Unix time, a random value, and string length for better randomness
     const unixTimeMillis = new Date().getTime(); // Use milliseconds for higher precision
     const cryptoRandom = new Uint32Array(1);
-    window.crypto.getRandomValues(cryptoRandom);
     const randomValue = cryptoRandom[0];
 
     const combinedValue = `${unixTimeMillis}${randomValue}${inputString.length}`;
@@ -24,7 +23,6 @@ export class BarcodeGeneratorService {
     const barcodeValue = digitsOnly.slice(0, 12);
 
     // Log or use the barcodeValue as needed
-    console.log('Generated Barcode:', barcodeValue);
 
     return barcodeValue;
   }
