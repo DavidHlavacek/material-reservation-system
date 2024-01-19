@@ -13,7 +13,7 @@ import { BarcodeGeneratorService } from '../../services/barcode-shared.service';
 @Component({
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
-  providers: [FormBuilder, HttpClient, RegistrationService, EmailService],
+  providers: [FormBuilder, HttpClient, RegistrationService, EmailService, BarcodeGeneratorService],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css'],
