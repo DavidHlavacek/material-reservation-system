@@ -33,7 +33,7 @@ router.get("/items", (req, res) => {
   
         const createdItemId = results.insertId;
         console.log("test");
-        res.status(201).json({ itemId: createdItemId });
+        return res.status(201).json({ itemId: createdItemId });
       }
     );
   });
