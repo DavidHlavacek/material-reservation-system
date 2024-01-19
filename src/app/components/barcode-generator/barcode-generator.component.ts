@@ -1,5 +1,8 @@
 import { Component, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+<<<<<<< HEAD
 
+=======
+>>>>>>> registration
 //import { AppComponent } from '../../app.component';
 
 import { NgxBarcode6Module } from 'ngx-barcode6';
@@ -12,6 +15,10 @@ import { FormsModule } from '@angular/forms';//import {} from '@angular/material
 //import {} from '@angular/router';
 // import 'core-js/actual';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
+=======
+import { BarcodeGeneratorService } from '../../services/barcode-shared.service';
+>>>>>>> registration
 //import {} from 'rxjs';
 
 
@@ -33,13 +40,18 @@ export class BarcodeGeneratorComponent {
 
   @ViewChild('dayOfTheYear') dayOfTheYear!: ElementRef; // Use "!" to tell TypeScript that it will be initialized later
 
+<<<<<<< HEAD
   constructor(private renderer: Renderer2) {
+=======
+  constructor(private renderer: Renderer2, private barcodeGeneratorService: BarcodeGeneratorService) {
+>>>>>>> registration
     // Initialize PrintSerials with sample data or load it from a service
     this.PrintSerials = [
       { SerialId: '12345' },
       { SerialId: '67890' },
       // ... other objects
     ];
+<<<<<<< HEAD
   }
 
   ngAfterViewInit() {
@@ -51,6 +63,19 @@ export class BarcodeGeneratorComponent {
     );
   }
 
+=======
+  } 
+
+  ngAfterViewInit() {
+    const dayOfYear = this.calculateDayOfYear();
+    this.renderer.setProperty(
+      this.dayOfTheYear.nativeElement,
+      'innerHTML',
+      this.yrs + dayOfYear
+    );
+  }
+
+>>>>>>> registration
   private calculateDayOfYear(): number {
     const timestmp = new Date().setFullYear(new Date().getFullYear(), 0, 1);
     const yearFirstDay = Math.floor(timestmp / 86400000);
@@ -72,6 +97,7 @@ export class BarcodeGeneratorComponent {
   }
 
   private generateBarcodeValue() {
+<<<<<<< HEAD
     // Combine Unix time with string length and update the barcode value
     const unixTime = Math.floor(new Date().getTime() / 1000);
     this.barcodeValue = `${unixTime}${this.inputString.length}`;
@@ -79,5 +105,9 @@ export class BarcodeGeneratorComponent {
     // Log or use the barcodeValue as needed
     return this.barcodeValue;
     console.log('Generated Barcode:', this.barcodeValue);
+=======
+   // Use the service to generate barcode value
+   return this.barcodeGeneratorService.generateBarcodeValue(this.inputString);
+>>>>>>> registration
   }
 }
