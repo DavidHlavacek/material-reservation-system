@@ -6,13 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RegistrationService {
+  private apiUrl = "http://localhost:3000/api"; 
+
   constructor(private http: HttpClient) {}
 
   checkEmailExistence(email: string): Observable<any> {
-    return this.http.get(`/api/check-email?email=${email}`);
+    return this.http.get(`${this.apiUrl}/check-email?email=${email}`);
   }
 
   registerEmail(email: string, name: string, barcode: number): Observable<any> {
-    return this.http.post('/api/register', { email, barcode });
+    return this.http.post(`${this.apiUrl}/register`, { email, name, barcode });
   }
 }

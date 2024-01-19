@@ -35,32 +35,33 @@ export class RegistrationComponent {
 
   register() {
     const form = this.registrationForm;
-
+  
     if (form && form.valid) {
       const emailControl = form.get('email');
-
+  
       if (emailControl) {
         const email = emailControl.value;
-
+  
         // Check if email address is from nhl
         if (!this.isValidEmailDomain(email)) {
           alert('Access denied. Please use a valid NHL Stenden email address.');
           return;
         }
-
+  
         // Check if email is already registered
         this.registrationService.checkEmailExistence(email).subscribe(
           (response: any) => {
-            if (response.exists) {
+            if (response && response.exists) {
               alert('Email already registered');
             } else {
+              alert('Email not registered')
               // Save email to the database
               const barcode = this.generateUniqueBarcode();
               const name = this.extractName(email);
               this.registrationService.registerEmail(email, name, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
-                  
+  
                   // Generate barcode to the email
                   this.sendBarcodeByEmail(email, name, barcode);
                 },
@@ -77,6 +78,7 @@ export class RegistrationComponent {
       }
     }
   }
+  
 
   extractName(email: string): string {
     let [firstName, lastName] = email.split('@')[0].split('.');
