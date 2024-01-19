@@ -71,11 +71,8 @@ export class RegistrationComponent implements AfterViewInit {
               this.registrationService.registerEmail(email, name, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
-<<<<<<< HEAD
   
-=======
 
->>>>>>> registration
                   // Generate barcode to the email
                   this.sendBarcodeByEmail(email, name, barcode);
                 },

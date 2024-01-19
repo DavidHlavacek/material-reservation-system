@@ -5,6 +5,21 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class BorrowerService {
-  private apiUrl = 'http://localhost:3000/api/borrowers';
+export class BarcodeService {
+  private apiUrl = 'http://localhost:3000/api/';
+  getItemStatus() {
+
+  }
+  getReservationWithUniqueItem() {
+
+  }
+  getReservationWithCommonItem() {
+    
+  }
+  checkoutItem() {
+
+  }
+  returnItem() {
+
+  }
 }

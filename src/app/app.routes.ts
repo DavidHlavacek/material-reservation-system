@@ -8,6 +8,7 @@ import { BarcodeGeneratorComponent } from './components/barcode-generator/barcod
 import { RegistrationComponent } from './components/registration/registration.component';
 import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
 import { CreateCategoryViewComponent } from './components/create-category-view/create-category-view.component';
+import { ScanBarcodeComponent } from './components/scan-barcode/scan-barcode.component';
 
 export const routes: Routes = [
   {
@@ -23,7 +24,7 @@ export const routes: Routes = [
         component: LoginComponent,
       },
       
-      { path: '', component: HomeComponent },
+      { path: '', component: ScanBarcodeComponent },
       {
         path: 'items',
         children: [
