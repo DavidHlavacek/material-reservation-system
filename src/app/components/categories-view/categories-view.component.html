@@ -1,1 +1,59 @@
-<p>categories-view works!</p>
+<form>
+    <div mat-dialog-actions>
+        <button mat-raised-button color="primary" (click)="createCategoryDialog()">
+            Create Category
+        </button>
+        <button mat-raised-button class="red" color="warn" (click)="deleteSelectedCategories()" [disabled]="!isDeleteButtonEnabled()">
+            Remove
+        </button>
+    </div>
+</form>
+  <br />
+  <mat-divider></mat-divider>
+  <br />
+<!-- reservation-table.component.html -->
+<div class="container">
+    <table mat-table #table [dataSource]="dataSource" matSort>
+        <!-- Select Column -->
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                    (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                >
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox
+                    (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                >
+                </mat-checkbox>
+            </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="CategoryName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+            <td mat-cell *matCellDef="let element"> {{ element.CategoryName }} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="Description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+            <td mat-cell *matCellDef="let element"> {{ element.Description || '...' }} </td>
+        </ng-container>
+  
+    
+        <!-- Add more columns as needed -->
+  
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+    </table>
+    <mat-paginator
+        [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons
+        aria-label="Select page of periodic elements"
+    >
+    </mat-paginator>
+</div>

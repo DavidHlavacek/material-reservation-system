@@ -1,0 +1,10 @@
+button {
+    border-radius: 5px 5px 5px 5px;
+    background-color: #00008B;
+    color: white;
+    margin-right: 5px;
+}
+.red {
+    background-color: #8B0000;
+    color: white;
+}

@@ -7,7 +7,7 @@ module.exports = (connection) => {
 
 router.get("/categories", (req, res) => {
     connection.query(
-      "SELECT CategoryName FROM Category",
+      "SELECT CategoryName, Description FROM Category",
       (error, results) => {
         if (error) {
           throw error;
@@ -39,8 +39,32 @@ router.get("/categories", (req, res) => {
         const createdCategoryId = results.insertId;
         res.status(201).json({ categoryId: createdCategoryId });
       }
+    ); 
+  });
+  router.delete('/categories/:categoryName', (req, res) => {
+    console.log("Received delete request");
+    const categoryName = req.params.categoryName;
+    console.log('Received request to delete category:', categoryName);
+
+    if (!categoryName) {
+        return res.status(400).json({ error: 'Invalid data. Make sure to provide CategoryName.' });
+    }
+    connection.query(
+        'DELETE FROM Category WHERE CategoryName = ?;',
+        [categoryName],
+        (error, results) => {
+            if (error) {
+                console.error('Error deleting category:', error);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            console.log(results);
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Category not found' });
+            }
+
+            res.status(200).json({ success: true });
+        }
     );
   });
-
   return router;
 };

@@ -21,6 +21,15 @@ export class CategoryService {
     const headers = { 'Content-Type': 'application/json' };
     return this.http.post<any>(this.apiUrl, category, { headers });
   }
+  deleteCategory(categoryName: string): Observable<any> {
+    console.log('Sending request to delete category:', categoryName);
+
+    const headers = { 'Content-Type': 'application/json' };
+    const url = `${this.apiUrl}/${encodeURIComponent(categoryName)}`;
+    console.log(url);
+    
+    return this.http.delete<any>(url, { headers: headers });
+  }
 }
 
 
