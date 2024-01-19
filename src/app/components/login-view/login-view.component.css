@@ -1,0 +1,25 @@
+header{
+    background-color: #009BAA;
+    height: fit-content;
+}
+
+header img{
+    width: 200px;
+}
+.Box
+{
+    
+}
+.imageLogin
+{
+float: left;
+width: 50%;
+height: 100%;
+}
+.formLogin
+{
+    float: right;
+    margin-right: 15%;
+    width: auto;
+    height: auto;
+}

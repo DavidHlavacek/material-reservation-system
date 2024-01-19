@@ -9,7 +9,7 @@ import Email from "../../assets/smtp.js";
   providedIn: "root",
 })
 export class EmailService {
-  private readonly apiUrl = 'http://localhost:3000/api/send-email'; // Adjust the URL accordingly
+  private readonly apiUrlSendReminder = 'http://localhost:3000/api/send-reminder'; // Adjust the URL accordingly
 
   constructor(private http: HttpClient) { }
 
@@ -20,7 +20,17 @@ export class EmailService {
       body: `Dear ${borrower},\n\nIt's time to return ${itemName}.`,
     };
 
-    return this.http.post(this.apiUrl, emailData);
+    return this.http.post(this.apiUrlSendReminder, emailData);
+  }
+
+  sendBarcode(borrowerEmail: string, name: string, barcode: number) {
+    const emailData = {
+      to: borrowerEmail,
+      subject: 'Reminder',
+      body: `Dear ${name},\n\nThis is your barcode: ${barcode}.`,
+    };
+
+    return this.http.post(this.apiUrlSendReminder, emailData);
   }
 }
 

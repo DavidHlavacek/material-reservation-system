@@ -1,8 +1,16 @@
-header{
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background-color: #009BAA;
     height: fit-content;
-}
-
-header img{
+    padding: 10px;
+    height: 80px;
+    margin: 0; /* Add this line to reset margin */
+  }
+  
+  header img {
     width: 200px;
-}
+  }
+  
+  /* Adjustments for sidebar position */

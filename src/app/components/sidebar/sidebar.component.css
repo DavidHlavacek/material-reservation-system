@@ -1,15 +1,26 @@
 .sidebarContainer {
-  background-color: white;
-  width: 12.5%;
-  height: 100%;
   position: fixed;
-  top: 0;
+  top: 100px;
   right: 0;
+  height: 100%;
+  background-color: #fff; /* Adjust the background color as needed */
+  margin: 0; /* Add this line to reset margin */
+  padding: 0;
+}
+
+.mat-sidenav-container {
+  border-left: 1px solid #ccc; /* Add this line to add a border */
   
 }
 
-.toggleButton{
-  margin-top: 0.5%;
-  margin-right: auto;
+
+a {
+  margin: 20px;
+   /* Adjust the margin as needed */
+}
+
+
+.toggleButton {
   margin-top: auto;
+  height: 100%; /* Add this line to cover the entire height */
 }

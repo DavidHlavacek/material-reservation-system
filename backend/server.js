@@ -31,6 +31,7 @@ const historyRoute = require('./routes/history')(connection);
 const categoriesRoute = require('./routes/categories')(connection);
 const borrowersRoute = require('./routes/borrowers')(connection);
 const emailRoute = require('./routes/mail')(connection); // Include the email route
+const registrationRoute = require('./routes/registration')(connection); // Include the email route
 
 
 app.use('/api', itemsRoute); // Mount the 'items' route under '/api/items'
@@ -38,6 +39,7 @@ app.use('/api', historyRoute);
 app.use('/api', categoriesRoute); 
 app.use('/api', borrowersRoute);
 app.use('/api', emailRoute); // Mount the email route under '/api/send-email'
+app.use('/api', registrationRoute);
 
 
 

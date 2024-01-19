@@ -1,0 +1,29 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+  }
+  
+  h1 {
+    font-size: 60px; 
+    padding: 20px;
+  }
+  
+  #email {
+    margin-bottom: 10px;
+    width: 170px;
+  }
+  
+  div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  form {
+    padding: 20px;
+  }
+
+  label[for="email"] {
+    margin-right: 10px;
+  }
+  
