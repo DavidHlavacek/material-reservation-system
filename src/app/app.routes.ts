@@ -9,6 +9,7 @@ import { RegistrationComponent } from './components/registration/registration.co
 import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
 import { CreateCategoryViewComponent } from './components/create-category-view/create-category-view.component';
 import { ScanBarcodeComponent } from './components/scan-barcode/scan-barcode.component';
+import { HistoryListComponent } from './components/history-view/history-list/history-list.component';
 
 export const routes: Routes = [
   {
@@ -23,8 +24,11 @@ export const routes: Routes = [
         path: 'login',
         component: LoginComponent,
       },
-      
-      { path: '', component: ScanBarcodeComponent },
+
+      {
+        path: '',
+        component: ScanBarcodeComponent
+      },
       {
         path: 'items',
         children: [
@@ -41,12 +45,9 @@ export const routes: Routes = [
           { path: 'create-category', component: CreateCategoryViewComponent },
         ],
       },
-      { path: 'barcode', redirectTo: 'barcode/barcode-generator', pathMatch: 'full' },
       {
-        path: 'barcode',
-        children: [
-          { path: 'barcode-generator', component: BarcodeGeneratorComponent },
-        ],
+        path: 'history',
+        component: HistoryListComponent
       },
       { path: '**', redirectTo: '' },
     ],

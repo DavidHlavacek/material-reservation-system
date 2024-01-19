@@ -1,13 +1,13 @@
 <mat-sidenav-container class="sidebarContainer">
   <mat-sidenav #sidenav mode="side" opened>
     <mat-nav-list>
-      <a mat-list-item routerLink="."><img src="../../../assets/barcodeImg.png"> Scan Barcode</a>
-      <a mat-list-item routerLink="/items/show-items"><img src="../../../assets/productImg.png"> Lend Materials</a>
-      <a mat-list-item routerLink="."><img src="../../../assets/returnImg.png"> Return Items</a>
-      <a mat-list-item routerLink="."><img src="../../../assets/categoryImg.png"> Categories</a>
+      <a mat-list-item routerLink="/barcode"><img src="../../../assets/barcodeImg.png"> Scan Barcode</a>
+      <a mat-list-item routerLink="/items/show-items"><img src="../../../assets/productImg.png"> Browse Materials</a>
+      <a mat-list-item routerLink="/barcode"><img src="../../../assets/returnImg.png"> Checkout/Return Items</a>
+      <a mat-list-item routerLink="/categories/show-categories"><img src="../../../assets/categoryImg.png"> Categories</a>
+      <a mat-list-item routerLink="/history"><img src="../../../assets/reservationImg.png"> History</a>
       <a mat-list-item routerLink="."><img src="../../../assets/borrowersImg.png"> Borrowers</a>
       <a mat-list-item routerLink="."><img src="../../../assets/userImg.png"> User</a>
-      <a mat-list-item routerLink="."><img src="../../../assets/reservationImg.png"> Reservations</a>
     </mat-nav-list>
   </mat-sidenav>
 </mat-sidenav-container>
