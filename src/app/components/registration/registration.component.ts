@@ -1,9 +1,14 @@
-// registration.component.ts
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
+
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  providers: [FormBuilder, HttpClient],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css']
@@ -11,6 +16,7 @@ import { HttpClient } from '@angular/common/http';
 
 export class RegistrationComponent {
   registrationForm: FormGroup;
+  isRegistered: boolean = false
 
   constructor(private formBuilder: FormBuilder, private http: HttpClient) {
     this.registrationForm = this.formBuilder.group({
@@ -43,7 +49,7 @@ export class RegistrationComponent {
               // Save email to the database
               this.http.post('/api/register', { email }).subscribe(
                 () => {
-                  alert('Congratulations! You are now registered.');
+                  this.isRegistered = true;
 
                   // Generate barcode to the email
                   const barcode = this.generateUniqueBarcode();

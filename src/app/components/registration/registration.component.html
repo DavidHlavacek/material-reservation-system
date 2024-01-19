@@ -1,12 +1,20 @@
-<!-- registration.component.html -->
-<form [formGroup]="registrationForm">
+<link href="registration.component.css" rel="stylesheet">
+
+<div *ngIf="!isRegistered">
+  <h1>Register</h1>
+  <form [formGroup]="registrationForm">
     <label for="email">Email:</label>
-    <input type="email" id="email" formControlName="email" required>
-  
+    <input type="email" id="email" formControlName="email" required placeholder="Please use nhlstenden email">
+    
     <div>
       <input type="checkbox" id="agreeTerms" formControlName="agreeTerms">
       <label for="agreeTerms">I agree with the use and storage of my academic email address for the purpose of tracking of material borrowed.</label>
     </div>
-  
+    
     <button type="button" (click)="register()" [disabled]="!registrationForm.valid">Register</button>
   </form>
+</div>
+
+<div *ngIf="isRegistered">
+  <p>Congratulations! You have now registered.</p>
+</div>
