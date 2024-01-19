@@ -60,7 +60,7 @@ export class RegistrationComponent {
               this.registrationService.registerEmail(email, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
-
+                  
                   // Generate barcode to the email
                   this.sendBarcodeByEmail(email, barcode);
                 },
@@ -76,13 +76,6 @@ export class RegistrationComponent {
         );
       }
     }
-  }
-
-  extractName(email: string): string {
-    let [firstName, lastName] = email.split('@')[0].split('.');
-    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-    lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
-    return firstName + " " + lastName;
   }
 
   generateUniqueBarcode(): number {
