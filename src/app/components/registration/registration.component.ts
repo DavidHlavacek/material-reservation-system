@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css']
 })
+
 export class RegistrationComponent {
   registrationForm: FormGroup;
 
