@@ -66,13 +66,13 @@ export class RegistrationComponent implements AfterViewInit {
             } else {
               // Save email to the database
               const barcode = this.generateUniqueBarcode();
-
-              this.registrationService.registerEmail(email, barcode).subscribe(
+              const name = this.extractName(email);
+              this.registrationService.registerEmail(email, name, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
 
                   // Generate barcode to the email
-                  this.sendBarcodeByEmail(email, barcode);
+                  this.sendBarcodeByEmail(email, name, barcode);
                 },
                 error => {
                   console.error('Error saving email to the database:', error);
@@ -106,9 +106,9 @@ export class RegistrationComponent implements AfterViewInit {
     return barcodeValue;
   }
 
-  async sendBarcodeByEmail(email: string, barcode: number) {
+  async sendBarcodeByEmail(email: string, name: string, barcode: number) {
     // add barcode sending
-    await this.emailService.sendBarcode(email, barcode).subscribe();
+    await this.emailService.sendBarcode(email, name, barcode).subscribe();
   }
 
   isValidEmailDomain(email: string): boolean {

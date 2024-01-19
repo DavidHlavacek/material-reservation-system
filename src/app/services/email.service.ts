@@ -23,11 +23,11 @@ export class EmailService {
     return this.http.post(this.apiUrlSendReminder, emailData);
   }
 
-  sendBarcode(borrowerEmail: string, barcode: number) {
+  sendBarcode(borrowerEmail: string, name: string, barcode: number) {
     const emailData = {
       to: borrowerEmail,
       subject: 'Reminder',
-      body: `Dear ${borrowerEmail},\n\nThis is your barcode: ${barcode}.`,
+      body: `Dear ${name},\n\nThis is your barcode: ${barcode}.`,
     };
 
     return this.http.post(this.apiUrlSendReminder, emailData);
