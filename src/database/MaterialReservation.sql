@@ -15,10 +15,10 @@ INSERT INTO `Admin` (`AdminID`, `Email`, `HashedPassword`, `Name`) VALUES
 
 
 CREATE TABLE `Browser` (
-  `UserID` int(11) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Email` varchar(255) NOT NULL,
-  `NFCId` int(11) NOT NULL
+  `UserID` VARCHAR(255) NOT NULL,
+  `Name` VARCHAR(255) NOT NULL,
+  `Email` VARCHAR(255) NOT NULL,
+  `NFCId` INT(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -61,7 +61,7 @@ INSERT INTO `Item` (`ItemID`, `CategoryName`, `BarcodeID`, `Name`, `Status`) VAL
 
 
 CREATE TABLE `Reservation` (
-  `UserID` int(11) NOT NULL,
+  `UserID` VARCHAR(255) NOT NULL,
   `ItemID` int(11) NOT NULL,
   `BorrowDate` date NOT NULL DEFAULT (CURRENT_DATE),
   `ReturnDate` date DEFAULT NULL
@@ -93,15 +93,15 @@ ALTER TABLE `Reservation`
 
 
 ALTER TABLE `Admin`
-  MODIFY `AdminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `AdminID` int(11) NOT NULL;
 
 
 ALTER TABLE `Browser`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `UserID` VARCHAR(255) NOT NULL;
 
 
 ALTER TABLE `Item`
-  MODIFY `ItemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `ItemID` int(11) NOT NULL;
 
 
 

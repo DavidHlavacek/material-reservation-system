@@ -1,5 +1,4 @@
 import { Component, ViewChild, ElementRef, Renderer2 } from '@angular/core';
-
 //import { AppComponent } from '../../app.component';
 
 import { NgxBarcode6Module } from 'ngx-barcode6';

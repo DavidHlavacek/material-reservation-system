@@ -17,7 +17,7 @@ module.exports = (connection) => {
         const { to, subject, body } = req.body
 
         const mailOptions = {
-            from: "studentinfo@example.com", // Update with your email
+            from: "studentinfo@nhlstenden.com", // Update with your email
             to,
             subject,
             text: body,
@@ -42,7 +42,7 @@ module.exports = (connection) => {
         const { to, subject, body } = req.body
 
         const mailOptions = {
-            from: "studentinfo@example.com", // Update with your email
+            from: "studentinfo@nhlstenden.com", // Update with your email
             to,
             subject,
             text: body,
