@@ -3,22 +3,30 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { RegistrationService } from '../../services/registration.service';
+import { EmailService } from '../../services/email.service';
+
+
 
 
 @Component({
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
-  providers: [FormBuilder, HttpClient],
+  providers: [FormBuilder, HttpClient, RegistrationService, EmailService],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.css']
+  styleUrls: ['./registration.component.css'],
 })
 
 export class RegistrationComponent {
   registrationForm: FormGroup;
-  isRegistered: boolean = false
+  isRegistered: boolean = false;
 
-  constructor(private formBuilder: FormBuilder, private http: HttpClient) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private registrationService: RegistrationService,
+    private emailService: EmailService
+  ) {
     this.registrationForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       agreeTerms: [false, Validators.requiredTrue]
@@ -41,18 +49,19 @@ export class RegistrationComponent {
         }
 
         // Check if email is already registered
-        this.http.get(`/api/check-email?email=${email}`).subscribe(
+        this.registrationService.checkEmailExistence(email).subscribe(
           (response: any) => {
             if (response.exists) {
               alert('Email already registered');
             } else {
               // Save email to the database
-              this.http.post('/api/register', { email }).subscribe(
+              const barcode = this.generateUniqueBarcode();
+
+              this.registrationService.registerEmail(email, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
 
                   // Generate barcode to the email
-                  const barcode = this.generateUniqueBarcode();
                   this.sendBarcodeByEmail(email, barcode);
                 },
                 error => {
@@ -69,14 +78,14 @@ export class RegistrationComponent {
     }
   }
 
-  generateUniqueBarcode(): string {
+  generateUniqueBarcode(): number {
     // barcode generation?
-    return '123456789';
+    return 123456789;
   }
 
-  sendBarcodeByEmail(email: string, barcode: string) {
+  async sendBarcodeByEmail(email: string, barcode: number) {
     // add barcode sending
-    console.log(`Sending barcode ${barcode} to ${email}`);
+    await this.emailService.sendBarcode(email, barcode).subscribe();
   }
 
   isValidEmailDomain(email: string): boolean {
