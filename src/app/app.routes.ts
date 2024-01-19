@@ -5,6 +5,8 @@ import { ItemsComponent } from './components/items-view/items-view.component';
 import { LoginComponent } from './components/login-view/login-view.component';
 import { CreateItemViewComponent } from './components/create-item-view/create-item-view.component';
 import { BarcodeGeneratorComponent } from './components/barcode-generator/barcode-generator.component';
+import { RegistrationComponent } from './components/registration/registration.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -23,15 +25,24 @@ export const routes: Routes = [
           { path: 'show-items', component: ItemsComponent },
           { path: 'create-item', component: CreateItemViewComponent },
         ],
-      },    
-      // Add more routes as needed
-      { path: '**', redirectTo: '' }, // Default route within the layout
-      {path: 'barcode',
+      },
+      {
+        path: 'registration',
+        component: RegistrationComponent,
         children: [
-          { path: '', redirectTo: 'generate-barcode', pathMatch: 'full' },
-          { path: 'barcode-generator', component: BarcodeGeneratorComponent }
-        ]
-      }
+          { path: '', redirectTo: 'show-registration', pathMatch: 'full' },
+          // Remove the next line if ShowRegistrationComponent is not needed
+      
+        ],
+      },
+      { path: 'barcode', redirectTo: 'barcode/barcode-generator', pathMatch: 'full' },
+      {
+        path: 'barcode',
+        children: [
+          { path: 'barcode-generator', component: BarcodeGeneratorComponent },
+        ],
+      },
+      { path: '**', redirectTo: '' },
     ],
   },
 ];
