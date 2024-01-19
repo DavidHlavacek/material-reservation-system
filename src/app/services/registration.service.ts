@@ -14,7 +14,7 @@ export class RegistrationService {
     return this.http.get(`${this.apiUrl}/check-email?email=${email}`);
   }
 
-  registerEmail(email: string, name: string, barcode: number): Observable<any> {
+  registerEmail(email: string, name: string, barcode: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, { email, name, barcode });
   }
 }

@@ -38,8 +38,7 @@ export class RegistrationComponent implements AfterViewInit {
     });
   }
   ngAfterViewInit(): void {
-    throw new Error('Method not implemented.');
-    const generatedBarcode = this.barcodeGeneratorService.generateBarcodeValue('your-input-string');
+    const generatedBarcode = this.barcodeGeneratorService.generateBarcodeValue('teeeest-ss-GAHAIHEF97979');
     console.log('Generated Barcode:', generatedBarcode);
   }
 
@@ -53,10 +52,10 @@ export class RegistrationComponent implements AfterViewInit {
         const email = emailControl.value;
   
         // Check if email address is from nhl
-        if (!this.isValidEmailDomain(email)) {
-          alert('Access denied. Please use a valid NHL Stenden email address.');
-          return;
-        }
+        // if (!this.isValidEmailDomain(email)) {
+        //   alert('Access denied. Please use a valid NHL Stenden email address.');
+        //   return;
+        // }
   
         // Check if email is already registered
         this.registrationService.checkEmailExistence(email).subscribe(
@@ -64,18 +63,14 @@ export class RegistrationComponent implements AfterViewInit {
             if (response && response.exists) {
               alert('Email already registered');
             } else {
-              alert('Email not registered')
               // Save email to the database
-              const barcode = this.generateUniqueBarcode();
+              const barcode = this.generateUniqueBarcode(email);
               const name = this.extractName(email);
+              console.log("David barcode: ", barcode);
               this.registrationService.registerEmail(email, name, barcode).subscribe(
                 () => {
                   this.isRegistered = true;
-<<<<<<< HEAD
   
-=======
-
->>>>>>> registration
                   // Generate barcode to the email
                   this.sendBarcodeByEmail(email, name, barcode);
                 },
@@ -94,6 +89,7 @@ export class RegistrationComponent implements AfterViewInit {
   }
   
 
+
   extractName(email: string): string {
     let [firstName, lastName] = email.split('@')[0].split('.');
     firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
@@ -101,20 +97,30 @@ export class RegistrationComponent implements AfterViewInit {
     return firstName + " " + lastName;
   }
 
-  generateUniqueBarcode(): number {
+  generateUniqueBarcode(email: string): string {
     // barcode generation?
-    const barcodeString = this.barcodeGeneratorService.generateBarcodeValue(this.inputString);
-
-    const barcodeValue = Number(barcodeString);
-
+    const barcodeString = this.barcodeGeneratorService.generateBarcodeValue(email);
+  
+    const barcodeValue = String(barcodeString);
+  
     console.log('Generated Barcode:', barcodeValue);
-    
+  
     return barcodeValue;
   }
+  
 
-  async sendBarcodeByEmail(email: string, name: string, barcode: number) {
+  async sendBarcodeByEmail(email: string, name: string, barcode: string) {
     // add barcode sending
-    await this.emailService.sendBarcode(email, name, barcode).subscribe();
+    if (email) {
+      try {
+        await this.emailService.sendBarcode(email, name, barcode).toPromise();
+        alert('Barcode sent successfully');
+      } catch (error) {
+        console.error('Error fetching borrower email or sending reminder:', error);
+        alert('Error!');
+        // Handle error fetching email or sending reminder
+      }
+    }
   }
 
   isValidEmailDomain(email: string): boolean {

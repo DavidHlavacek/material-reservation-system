@@ -10,6 +10,7 @@ import Email from "../../assets/smtp.js";
 })
 export class EmailService {
   private readonly apiUrlSendReminder = 'http://localhost:3000/api/send-reminder'; // Adjust the URL accordingly
+  private readonly apiUrlSendBarcode = 'http://localhost:3000/api/send-barcode'; // Adjust the URL accordingly
 
   constructor(private http: HttpClient) { }
 
@@ -23,14 +24,14 @@ export class EmailService {
     return this.http.post(this.apiUrlSendReminder, emailData);
   }
 
-  sendBarcode(borrowerEmail: string, name: string, barcode: number) {
+  sendBarcode(borrowerEmail: string, name:string, barcode: string) {
     const emailData = {
       to: borrowerEmail,
-      subject: 'Reminder',
-      body: `Dear ${name},\n\nThis is your barcode: ${barcode}.`,
+      subject: 'Barcode',
+      body: `Dear ${name},\n\nYour barcode is: ${barcode}.`,
     };
 
-    return this.http.post(this.apiUrlSendReminder, emailData);
+    return this.http.post(this.apiUrlSendBarcode, emailData);
   }
 }
 
