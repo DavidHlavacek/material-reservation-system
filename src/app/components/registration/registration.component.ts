@@ -65,7 +65,7 @@ export class RegistrationComponent {
                   this.sendBarcodeByEmail(email, barcode);
                 },
                 error => {
-                  console.error('Error saving email to the database:', error);
+                  console.error('Error saving email to the database :', error);
                 }
               );
             }
