@@ -1,17 +1,25 @@
-<div class="Box">
-    <div class="imageLogin"><img src=""></div>
-
-    <div  class="signInDiv">
-        <h1 class="signInHeader">Sign In</h1>
-    </div>
-
-    <div class="formLogin">
-        <input type="email" name="email">
+<mat-card>
+    <mat-card-content>
+        <mat-card-title>Sign In</mat-card-title>
+        
+        <mat-form-field appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" name="email">
+        </mat-form-field>
+        
         <p></p>
-        <input type="password" name="psk">
+        
+        <mat-form-field appearance="fill">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" name="psk">
+        </mat-form-field>
+        
         <p></p>
-        <a href="@" class="forgotPassword">Forgot Password</a>
+        
+        <a mat-button href="#" class="forgotPassword">Forgot Password</a>
+        
         <p></p>
-        <button class="buttonSignin">Sign In</button>
-    </div>
-</div>
+        
+        <button mat-button class="buttonSignin">Sign In</button>
+    </mat-card-content>
+</mat-card>

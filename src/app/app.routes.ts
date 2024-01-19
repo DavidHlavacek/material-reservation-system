@@ -7,13 +7,14 @@ import { CreateItemViewComponent } from './components/create-item-view/create-it
 import { BarcodeGeneratorComponent } from './components/barcode-generator/barcode-generator.component';
 export const routes: Routes = [
   {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
     path: '',
     component: LayoutComponent,
     children: [
+      {
+        path: 'login',
+        component: LoginComponent,
+      },
+      
       { path: '', component: HomeComponent },
       {
         path: 'items',
