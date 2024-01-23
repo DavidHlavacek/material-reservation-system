@@ -10,7 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   templateUrl: './scan-barcode.component.html',
   styleUrl: './scan-barcode.component.css'
 })
-export class ScanBarcodeComponent implements AfterViewInit{
+export class ScanBarcodeComponent implements AfterViewInit {
   scanForm: FormGroup;
 
   constructor(private fb: FormBuilder, private renderer: Renderer2, private el: ElementRef) {
@@ -45,64 +45,97 @@ export class ScanBarcodeComponent implements AfterViewInit{
   }
 
 
-isUserBarcodeVisible(): boolean {
-  const itemBarcodeControl = this.scanForm.get('itemBarcode');
-  return !!itemBarcodeControl && !!itemBarcodeControl.value && itemBarcodeControl.value.startsWith('9');
-}
+  isUserBarcodeVisible(): boolean {
+    const itemBarcodeControl = this.scanForm.get('itemBarcode');
+    return !!itemBarcodeControl && !!itemBarcodeControl.value && itemBarcodeControl.value.startsWith('9');
+  }
 
   ngAfterViewInit(): void {
     this.setFocus('itemBarcode');
   }
 
+  // Helper function to process checkout barcode
+  processCheckoutBarcode(): void {
+    console.log('Start Checkout Barcode Scanned');
+    this.resetForm();
+    this.setFocus('itemBarcode');
+  }
+
+  // Helper function to process return barcode
+  processReturnBarcode(): void {
+    console.log('Start Return Barcode Scanned');
+    this.resetForm();
+    this.setFocus('itemBarcode');
+  }
+
+  // Helper function to process item barcode
+  processItemBarcode(barcode: string): void {
+    console.log('Item Barcode Scanned:', barcode);
+    this.scanForm.get('itemBarcode')?.setValue(barcode);
+    this.resetForm();
+    this.setFocus('userBarcode');
+  }
+
+  // Helper function to process user identification barcode
+  processUserIdentificationBarcode(barcode: string): void {
+    console.log('User Identification Barcode Scanned:', barcode);
+    this.scanForm.get('userBarcode')?.setValue(barcode);
+  }
+
+  // Helper function to process confirm barcode
+  processConfirmBarcode(): void {
+    console.log('Submit/Confirm Barcode Scanned');
+
+    // Check if both item and user identification barcodes have been scanned
+    const itemBarcodeControl = this.scanForm.get('itemBarcode');
+    const userBarcodeControl = this.scanForm.get('userBarcode');
+
+    if (itemBarcodeControl && userBarcodeControl &&
+      itemBarcodeControl.value && userBarcodeControl.value) {
+      // Perform the necessary logic for confirming the checkout or return
+      console.log('Confirmed Checkout/Return');
+      this.resetForm();
+      this.setFocus('itemBarcode');
+    } else {
+      console.log('Both Item and User Identification Barcodes must be scanned first');
+    }
+  }
+
+  // Helper function to process cancel barcode
+  processCancelBarcode(): void {
+    console.log('Cancel Barcode Scanned');
+    this.resetForm();
+    this.setFocus('itemBarcode');
+  }
+
+  // Main function to handle barcode scanning
   handleBarcodeScanned(barcode: string): void {
     console.log('Scanned Barcode:', barcode);
 
     if (barcode.startsWith('8900000000121')) {
-      console.log('Start Checkout Barcode Scanned');
-      this.resetForm();
-      this.setFocus('itemBarcode');
+      this.processCheckoutBarcode();
     } else if (barcode.startsWith('8900000000131')) {
-      console.log('Start Return Barcode Scanned');
-      this.resetForm();
-      this.setFocus('itemBarcode');
+      this.processReturnBarcode();
     } else if (barcode.startsWith('1') || barcode.startsWith('9')) {
-      console.log('Item Barcode Scanned:', barcode);
-      this.scanForm.get('itemBarcode')?.setValue(barcode);
-      this.resetForm();
-      this.setFocus('userBarcode');
+      this.processItemBarcode(barcode);
     } else if (barcode.length === 14) {  // Check if it's a 14-digit barcode
-      console.log('User Identification Barcode Scanned:', barcode);
-      this.scanForm.get('userBarcode')?.setValue(barcode);
-      this.resetForm();
-      this.setFocus('itemBarcode');
+      this.processUserIdentificationBarcode(barcode);
     } else if (barcode.startsWith('8900000000777')) {
-      console.log('Submit/Confirm Barcode Scanned');
-      const itemBarcode = this.scanForm.get('itemBarcode')?.value;
-      const userBarcode = this.scanForm.get('userBarcode')?.value;
-
-      if (itemBarcode && userBarcode) {
-        console.log('Confirmed Checkout/Return');
-        this.resetForm();
-        this.setFocus('itemBarcode');
-      } else {
-        console.log('Both Item and User Identification Barcodes must be scanned first');
-      }
+      this.processConfirmBarcode();
     } else if (barcode.startsWith('8900000000444')) {
-      console.log('Cancel Barcode Scanned');
-      this.resetForm();
-      this.setFocus('itemBarcode');
+      this.processCancelBarcode();
     } else {
       console.log('Invalid Barcode Format');
     }
   }
-  
+
   private resetForm(): void {
     this.scanForm.patchValue({
       itemBarcode: null,
       userBarcode: null,
       // Add other form controls as needed
     });
-  
+
     this.scanForm.markAsUntouched();
     this.scanForm.markAsPristine();
   }
