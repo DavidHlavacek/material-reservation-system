@@ -23,6 +23,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
   private scannedBarcode: string = '';
   private delayTimer: any;
 
+  // This is needed in order to let all the inputs from the barcode scanner to be registered
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     const pressedKey = event.key;
@@ -44,7 +45,6 @@ export class ScanBarcodeComponent implements AfterViewInit {
     }
   }
 
-
   isUserBarcodeVisible(): boolean {
     const itemBarcodeControl = this.scanForm.get('itemBarcode');
     return !!itemBarcodeControl && !!itemBarcodeControl.value && itemBarcodeControl.value.startsWith('9');
@@ -57,6 +57,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
   // Helper function to process checkout barcode
   processCheckoutBarcode(): void {
     console.log('Start Checkout Barcode Scanned');
+    // Reset the form and set focus for the itemBarcode
     this.resetForm();
     this.setFocus('itemBarcode');
   }
@@ -64,6 +65,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
   // Helper function to process return barcode
   processReturnBarcode(): void {
     console.log('Start Return Barcode Scanned');
+    // Reset the form and set focus for the itemBarcode
     this.resetForm();
     this.setFocus('itemBarcode');
   }
@@ -72,6 +74,10 @@ export class ScanBarcodeComponent implements AfterViewInit {
   processItemBarcode(barcode: string): void {
     console.log('Item Barcode Scanned:', barcode);
     this.scanForm.get('itemBarcode')?.setValue(barcode);
+
+    // Check if the item barcode exists in the database
+    // Implement database logic here
+
     this.resetForm();
     this.setFocus('userBarcode');
   }
@@ -80,6 +86,9 @@ export class ScanBarcodeComponent implements AfterViewInit {
   processUserIdentificationBarcode(barcode: string): void {
     console.log('User Identification Barcode Scanned:', barcode);
     this.scanForm.get('userBarcode')?.setValue(barcode);
+
+      // Check if the user identification barcode exists in the database
+      // Implement database logic here
   }
 
   // Helper function to process confirm barcode
@@ -92,8 +101,14 @@ export class ScanBarcodeComponent implements AfterViewInit {
 
     if (itemBarcodeControl && userBarcodeControl &&
       itemBarcodeControl.value && userBarcodeControl.value) {
+
+      // Check if the item is reserved or checked out in the database
+      // Implement database logic here
+      
       // Perform the necessary logic for confirming the checkout or return
       console.log('Confirmed Checkout/Return');
+
+      // Reset the form and set focus for the itemBarcode
       this.resetForm();
       this.setFocus('itemBarcode');
     } else {
@@ -104,6 +119,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
   // Helper function to process cancel barcode
   processCancelBarcode(): void {
     console.log('Cancel Barcode Scanned');
+    // Reset the form and set focus for the itemBarcode
     this.resetForm();
     this.setFocus('itemBarcode');
   }
