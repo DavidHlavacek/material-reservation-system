@@ -1,16 +1,17 @@
 <h2>Scan Barcode</h2>
 <div class="scan-barcode-form">
-  <form [formGroup]="scanForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="scanForm">
     <div class="form-group">
       <label for="itemBarcode">Item Barcode</label>
       <input type="text" id="itemBarcode" formControlName="itemBarcode" />
     </div>
 
-    <div *ngIf="scanForm.get('itemBarcode')?.value.startsWith('9')" class="form-group">
+    <div *ngIf="isUserBarcodeVisible()" class="form-group">
       <label for="userBarcode">User Barcode</label>
       <input type="text" id="userBarcode" formControlName="userBarcode" />
     </div>
 
-    <button type="submit" class="submit-button">Submit</button>
+    <!-- Add other fields as needed -->
+
   </form>
 </div>
