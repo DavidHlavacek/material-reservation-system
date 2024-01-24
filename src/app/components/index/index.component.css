@@ -1,0 +1,26 @@
+.buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+button {
+    background-color: #009BAA;
+    border: none; 
+    height: 5vh;
+    width: 13vw;
+    margin-top: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button a {
+    text-decoration: none;
+    color: black;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: #068692;
+    color: white;
+}
+
