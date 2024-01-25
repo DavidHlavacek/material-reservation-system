@@ -2,6 +2,67 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (connection) => {
+    router.get("/itemByBarcode/:barcodeId", (req, res) => {
+        const barcodeId = req.params.barcodeId;
+        console.log(`requested barcode: ${barcodeId}`);
+        connection.query(
+          // TODO: change to use BarcodeID instead of ItemID in WHERE
+          "SELECT ItemID, CategoryName, BarcodeID, Name, Status FROM Item WHERE ItemID = ?",
+          [barcodeId],
+          (error, results) => {
+            if (error) {
+              console.error('Error getting item status:', error);
+              return res.status(500).json({ error: 'Internal server error' });
+            }
+    
+            if (results.length === 0) {
+              return res.status(404).json({ error: 'Item not found' });
+            }
+    
+            res.setHeader("Content-Type", "application/json");
+            res.json(results);
+          }
+        )
+    });
+
+    router.get("/uniqueReservation/:itemId", (req, res) => {
+      const itemId = req.params.itemId;
+      connection.query(
+      "SELECT Reservation.UserID as UserID, Reservation.ItemID AS ItemID, Item.CategoryName AS CategoryName, Browser.Name AS Borrower, DATE_FORMAT(Reservation.BorrowDate, '%d/%m/%Y') AS DateReserved, DATE_FORMAT(Reservation.ReturnDate, '%d/%m/%Y') AS DateReturned FROM Reservation JOIN Item ON Reservation.ItemID = Item.ItemID JOIN Browser ON Reservation.UserID = Browser.UserID WHERE Reservation.ReturnDate IS NULL AND Reservation.ItemID = ?;",
+      [itemId],
+      (error, results) => {
+        if (error) {
+          return res.status(500).json({ error: 'Internal server error' });
+        }
+        if (results.length == 0) {
+          res.json({});
+        }
+        else {
+          res.json(results);
+        }
+      }
+      )
+    });
+
+    router.get("/nonUniqueReservation/:itemId/:userId", (req, res) => {
+      const itemId = req.params.itemId;
+      const userId = req.params.userId;
+      connection.query(
+      "SELECT Reservation.UserID as UserID, Reservation.ItemID AS ItemID, Item.CategoryName AS CategoryName, Browser.Name AS Borrower, DATE_FORMAT(Reservation.BorrowDate, '%d/%m/%Y') AS DateReserved, DATE_FORMAT(Reservation.ReturnDate, '%d/%m/%Y') AS DateReturned FROM Reservation JOIN Item ON Reservation.ItemID = Item.ItemID JOIN Browser ON Reservation.UserID = Browser.UserID WHERE Reservation.ReturnDate IS NULL AND Reservation.ItemID = ? AND Reservation.UserID = ?;",
+      [itemId, userId],
+      (error, results) => {
+        if (error) {
+          return res.status(500).json({ error: 'Internal server error' });
+        }
+        if (results.length == 0) {
+          res.json({});
+        }
+        else {
+          res.json(results);
+        }
+      }
+      )
+    });
 
     router.get("/getItemStatus/:itemId", (req, res) => {
         const itemId = req.params.itemId;
@@ -83,7 +144,7 @@ module.exports = (connection) => {
         }
 
         connection.query(
-          'UPDATE Reservation SET ReturnDate = CURRENT_DATE WHERE ItemID = ?',
+          'UPDATE Reservation SET ReturnDate = CURRENT_DATE WHERE ItemID = ? AND ReturnDate IS NULL',
           [itemId],
           (err, results) => {
             if (err) {

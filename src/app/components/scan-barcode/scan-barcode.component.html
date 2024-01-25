@@ -1,14 +1,40 @@
 <h2>Scan Barcode</h2>
 <div class="scan-barcode-form">
+  <h2 *ngIf="isCheckIn()===null">Enter Item Barcode</h2>
+  <h2 *ngIf="isCheckIn()===true">Return Item</h2>
+  <h2 *ngIf="isCheckIn()===false">Checkout Item</h2>
   <form [formGroup]="scanForm">
     <div class="form-group">
       <label for="itemBarcode">Item Barcode</label>
       <input type="text" id="itemBarcode" formControlName="itemBarcode" />
     </div>
+    <div *ngIf="showItemMissingBox()" class="error-box">
+      <h3>Could not find item with barcode: {{ scanForm.get('itemBarcode')?.value }}</h3>
+    </div>
+    <div *ngIf="targetItem" class="info-box">
+      <h3>Item found</h3>
+      <p>Item ID: {{ targetItem?.ItemID }}</p>
+      <p>Item name: {{ targetItem?.Name }}</p>
+      <p>Item category: {{ targetItem?.CategoryName }}</p>
+      <p>Item status: {{targetItem?.Status}}</p>
+      <div *ngIf="targetReservation">
+        <h3>Reservation Found</h3>
+        <p>Borrower: {{targetReservation?.Borrower}}</p>
+        <p>Checkout Date: {{targetReservation?.DateReserved}}</p>
+      </div>
+      <div *ngIf="!targetReservation">
+        <h3>No reservation found</h3>
+      </div>
+    </div>
 
     <div *ngIf="isUserBarcodeVisible()" class="form-group">
       <label for="userBarcode">User Barcode</label>
       <input type="text" id="userBarcode" formControlName="userBarcode" />
+    </div>
+
+    <div *ngIf="isCommandBarcodeVisible()" class="form-group">
+      <label for="commandBarcode">Command Barcode</label>
+      <input type="text" id="commandBarcode" formControlName="commandBarcode" />
     </div>
 
     <!-- Add other fields as needed -->
