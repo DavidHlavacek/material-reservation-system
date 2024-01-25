@@ -11,6 +11,17 @@ export class CheckoutService {
 
   constructor(private http: HttpClient) { }
 
+  getItemByBarcode(barcodeId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/itemByBarcode/${barcodeId}`);
+  }
+
+  getUniqueReservation(itemBarcode: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/uniqueReservation/${itemBarcode}`);
+  }
+  getNonUniqueReservation(itemBarcode: number, userBarcode:number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/nonUniqueReservation/${itemBarcode}/${userBarcode}`);
+  }
+
   getItemStatus(itemId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/getItemStatus/${itemId}`);
   }

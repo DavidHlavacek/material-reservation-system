@@ -19,3 +19,15 @@
     border: none;
     cursor: pointer;
   }
+  .info-box {
+    background-color: aquamarine;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  .error-box {
+    background-color: red;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }

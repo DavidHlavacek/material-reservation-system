@@ -2,21 +2,34 @@ import { Component, AfterViewInit, ElementRef, Renderer2, HostListener } from '@
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ItemService } from '../../services/item.service';
+import { CheckoutService } from '../../services/checkout.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'scan-barcode',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,],
+  providers: [ItemService, CheckoutService,],
   templateUrl: './scan-barcode.component.html',
   styleUrl: './scan-barcode.component.css'
 })
 export class ScanBarcodeComponent implements AfterViewInit {
   scanForm: FormGroup;
+  targetItem: any = null;
+  targetReservation: any = null;
 
-  constructor(private fb: FormBuilder, private renderer: Renderer2, private el: ElementRef) {
+  constructor(
+    private fb: FormBuilder, 
+    private renderer: Renderer2, 
+    private el: ElementRef,
+    private itemService: ItemService,
+    private checkoutService: CheckoutService,
+    ) {
     this.scanForm = this.fb.group({
       itemBarcode: ['', Validators.required],
       userBarcode: ['', Validators.required],
+      commandBarcode: ['', Validators.required],
     });
   }
 
@@ -41,13 +54,105 @@ export class ScanBarcodeComponent implements AfterViewInit {
 
         // Reset the scanned barcode for the next input
         this.scannedBarcode = '';
-      }, 500);
+      }, 3000);
     }
   }
 
   isUserBarcodeVisible(): boolean {
     const itemBarcodeControl = this.scanForm.get('itemBarcode');
-    return !!itemBarcodeControl && !!itemBarcodeControl.value && itemBarcodeControl.value.startsWith('9');
+    return !!itemBarcodeControl && (!!itemBarcodeControl.value && itemBarcodeControl.value.startsWith('9')) || !this.targetReservation;
+  }
+
+  isCommandBarcodeVisible(): boolean {
+    const itemBarcodeControl = this.scanForm.get('itemBarcode');
+    return !!itemBarcodeControl && !!itemBarcodeControl.value;
+  }
+
+  isBarcodeFieldEmpty(): boolean {
+    const itemBarcodeControl = this.scanForm.get("itemBarcode");
+    return itemBarcodeControl === null || itemBarcodeControl.value === "";
+  }
+
+  getItemDetailsByBarcode(): void {
+    const itemBarcodeControl = this.scanForm.get('itemBarcode');
+
+    if (itemBarcodeControl && itemBarcodeControl.value) {
+      const barcodeId = itemBarcodeControl.value;
+
+      this.checkoutService.getItemByBarcode(barcodeId).subscribe(
+        (itemDetails) => {
+          if (itemDetails) {
+            this.targetItem = itemDetails[0];
+            // Item found, you can now display details in the UI
+            console.log('Item found:', this.targetItem);
+          } else {
+            // Item not found
+            this.targetItem = null;
+            console.log('Item not found');
+          }
+        },
+        (error) => {
+          this.targetItem = null;
+          console.error('Error fetching item details:', error);
+        }
+      );
+    }
+  }
+  getReservationDetails(): void {
+    const itemBarcodeControl = this.scanForm.get('itemBarcode');
+    const userBarcodeControl = this.scanForm.get('userBarcode');
+  
+    if (itemBarcodeControl) {
+      const itemCode = itemBarcodeControl.value;
+      let userCode: number | null = null;
+  
+      if (userBarcodeControl) {
+        userCode = userBarcodeControl.value;
+      }
+  
+      if (userCode === null) {
+        // No user barcode provided
+        this.checkoutService.getUniqueReservation(itemCode).subscribe(
+          (reservationDetails) => {
+            if (reservationDetails && reservationDetails.length > 0) {
+              console.log(reservationDetails);
+              this.targetReservation = reservationDetails[0];
+            } else {
+              this.targetReservation = null;
+            }
+          },
+          (error) => {
+            this.targetReservation = null;
+          }
+        );
+      } else {
+        // User barcode provided
+        this.checkoutService.getNonUniqueReservation(itemCode, userCode).subscribe(
+          (reservationDetails) => {
+            if (reservationDetails && reservationDetails.length > 0) {
+              console.log(reservationDetails);
+              this.targetReservation = reservationDetails[0];
+            } else {
+              this.targetReservation = null;
+            }
+          },
+          (error) => {
+            this.targetReservation = null;
+          }
+        );
+      }
+    }
+  }
+
+  isCheckIn(): boolean | null {
+    if (!this.targetItem) {
+      return null;
+    }
+    return this.targetItem.Status == "Issued";
+  }
+
+  showItemMissingBox(): boolean {
+    return !this.isBarcodeFieldEmpty() && this.targetItem == null;
   }
 
   ngAfterViewInit(): void {
@@ -127,6 +232,21 @@ export class ScanBarcodeComponent implements AfterViewInit {
   // Main function to handle barcode scanning
   handleBarcodeScanned(barcode: string): void {
     console.log('Scanned Barcode:', barcode);
+    this.getItemDetailsByBarcode();
+    this.getReservationDetails();
+    if (barcode.startsWith('8900000000777')) {
+      if (this.targetReservation) {
+        console.log("trying item check-in");
+        // Check In
+        this.checkoutService.returnItem(this.targetItem.ItemID);
+      } 
+      else if (this.targetItem) {
+        console.log('Trying item checkout');
+        // Check Out
+        const userBarcodeControl = this.scanForm.get('userBarcode');
+        this.checkoutService.checkoutItem(this.targetItem, userBarcodeControl?.value);
+      }
+    }
 
     if (barcode.startsWith('8900000000121')) {
       this.processCheckoutBarcode();
@@ -149,6 +269,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
     this.scanForm.patchValue({
       itemBarcode: null,
       userBarcode: null,
+      commandBarcode: null,
       // Add other form controls as needed
     });
 
