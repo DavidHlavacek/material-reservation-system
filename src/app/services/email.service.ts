@@ -13,7 +13,7 @@ export class EmailService {
 
   constructor(private http: HttpClient) { }
 
-  sendReminder(borrower: number, borrowerEmail: string, itemName: string) {
+  sendReminder(borrower: string, borrowerEmail: string, itemName: string) {
     const emailData = {
       to: borrowerEmail,
       subject: 'Reminder',
