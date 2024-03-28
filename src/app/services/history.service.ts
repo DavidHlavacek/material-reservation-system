@@ -20,12 +20,4 @@ export class HistoryService {
       const headers = { 'Content-Type': 'application/json' };
       return this.http.post<any>(this.apiUrl, entry, { headers });
     } 
-  /*
-    createItem(item: History): Observable<any> {
-      console.log('Sending item:', item); // Add this line
-  
-      const headers = { 'Content-Type': 'application/json' };
-      return this.http.post<any>(this.apiUrl, item, { headers });
-    }
-    */
 }

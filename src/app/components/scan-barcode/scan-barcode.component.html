@@ -1,5 +1,29 @@
 <h2>Scan Barcode</h2>
 <div class="scan-barcode-form">
+  <p>{{this.userInstruction}}</p>
+  <form [formGroup]="scanForm">
+    <div class="form-group">
+      <label for="barcode">Item Barcode</label>
+      <input type="text" id="barcode" formControlName="barcode" />
+    </div>
+    <div *ngIf="error" class="error-box">
+      <h3>{{error}}</h3>
+      <p *ngIf="errorDisplayMode==InfoType.Item"><a href="/items">View Items</a></p>
+    </div>
+    <div *ngIf="targetItem" class="info-box">
+      <h3>&#x2139; Item found</h3>
+      <p>Item ID: {{ targetItem?.ItemID }}</p>
+      <p>Item name: {{ targetItem?.Name }}</p>
+      <p>Item category: {{ targetItem?.CategoryName }}</p>
+      <p>Item status: {{targetItem?.Status}}</p>
+    </div>
+    <div *ngIf="processStatus!==''" class="results-box">
+      <p>{{processStatus}}</p>
+    </div>
+  </form>
+</div>
+<!--
+<div class="scan-barcode-form">
   <h2 *ngIf="isCheckIn()===null">Enter Item Barcode</h2>
   <h2 *ngIf="isCheckIn()===true">Return Item</h2>
   <h2 *ngIf="isCheckIn()===false">Checkout Item</h2>
@@ -37,7 +61,6 @@
       <input type="text" id="commandBarcode" formControlName="commandBarcode" />
     </div>
 
-    <!-- Add other fields as needed -->
-
   </form>
 </div>
+-->

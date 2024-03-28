@@ -33,4 +33,8 @@ export class CheckoutService {
   returnItem(itemId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/returnItem`, { itemId });
   }
+
+  getBorrower(nfcId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/getBorrower/${nfcId}`);
+  }
 }

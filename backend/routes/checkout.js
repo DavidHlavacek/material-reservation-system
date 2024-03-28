@@ -158,6 +158,35 @@ module.exports = (connection) => {
       }
     );
   });
+  router.get("/getBorrower/:nfcId", (req, res) => {
+    const nfcId = req.params.nfcId;
+
+    // Validate nfcId
+    if (!nfcId) {
+        return res.status(400).json({ error: 'NFCId is required' });
+    }
+
+    // Implement logic to fetch borrower details from the database based on NFCId
+    connection.query(
+        'SELECT * FROM Browser WHERE NFCId = ?',
+        [nfcId],
+        (error, results) => {
+            if (error) {
+                console.error('Error fetching borrower details:', error);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+
+            // Check if borrower exists
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Borrower not found' });
+            }
+
+            // Borrower found, return borrower details
+            const borrower = results[0];
+            return res.status(200).json(borrower);
+        }
+    );
+  });
 
   return router;
 };

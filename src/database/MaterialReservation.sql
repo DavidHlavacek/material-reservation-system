@@ -39,7 +39,8 @@ CREATE TABLE `Category` (
 
 INSERT INTO `Category` (`CategoryName`, `Description`) VALUES
 ('BattleBot', 'Arduino with some stuff atahced on top'),
-('Raspbery PI', 'Small little computer');
+('Raspbery PI', 'Small little computer'),
+('Wires', 'Wires for the battlebot');
 
 
 
@@ -56,7 +57,8 @@ CREATE TABLE `Item` (
 
 INSERT INTO `Item` (`ItemID`, `CategoryName`, `BarcodeID`, `Name`, `Status`) VALUES
 (12, 'BattleBot', 25612, 'Battle bot numero uno', 'Not issued'),
-(125, 'Raspbery PI', 2512, 'Raspbery PI numero dos', 'Issued');
+(125, 'Raspbery PI', 2512, 'Raspbery PI numero dos', 'Issued'),
+(991, 'Wires', 2551, 'Wires', 'Not issued');
 
 
 
