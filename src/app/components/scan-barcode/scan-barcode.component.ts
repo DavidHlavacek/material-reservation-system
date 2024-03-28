@@ -165,24 +165,9 @@ export class ScanBarcodeComponent implements AfterViewInit {
           this.errorDisplayMode = InfoType.Command;
         } else {
           if (this.isCheckout === true) {
-            const historyEntry: History = {
-              ItemID: this.targetItem.ItemID, // Assuming this is available
-              UserID: this.targetUser.UserID, // Assuming this is available
-              CategoryName: this.targetItem.CategoryName, // Assuming this is available
-              Borrower: this.targetUser.UserName, // Assuming this is available
-              DateReserved: new Date(), // Example date, you need to replace this with the actual date
-            };
-        
-            try {
-              // Call the createEntry method of HistoryService to create a new entry
-              const response = await this.historyService.createEntry(historyEntry);
-              console.log('History entry created successfully:', response);
-            } catch (error) {
-              console.error('Error creating history entry:', error);
-              // Handle error appropriately
-            }
+            await this.checkoutService.checkoutItem(this.targetItem.itemId, this.targetUser.UserId);
           } else {
-            
+            await this.checkoutService.returnItem(this.targetItem);
           }
         }
       }
