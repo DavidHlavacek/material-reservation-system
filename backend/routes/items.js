@@ -23,12 +23,12 @@ router.get("/items", (req, res) => {
     }
   
     connection.query(
-      'INSERT INTO Item (CategoryName, BarcodeID, Name, Status) VALUES (?, ?, ?, ?)',
-      [newItem.CategoryName, newItem.BarcodeID || null, newItem.Name, newItem.Status],
+      'INSERT INTO Item (ItemID, CategoryName, BarcodeID, Name, Status) VALUES (?, ?, ?, ?, ?)',
+      [newItem.ItemID, newItem.CategoryName, newItem.BarcodeID || null, newItem.Name, newItem.Status],
       (error, results) => {
         if (error) {
           console.error('Error inserting item:', error);
-          return res.status(500).json({ error: 'Internal server error' });
+          return res.status(500).json({ error: 'Internal server error', msg: error });
         }
   
         const createdItemId = results.insertId;

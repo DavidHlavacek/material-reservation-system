@@ -86,78 +86,66 @@ module.exports = (connection) => {
         );
       });
 
-  router.post("/checkoutItem", (req, res) => {
-    const itemId = req.body.itemId;
-    const userId = req.body.userId;
-
-    // Implement logic to update item status to 'Not Issued'
-    connection.beginTransaction((err) => {
-      if (err) {
-        console.error('Error starting transaction:', err);
-        return res.status(500).json({ error: 'Internal server error' });
-      }
-
-      connection.query(
-        'UPDATE Item SET Status = "Not Issued" WHERE ItemID = ?',
-        [itemId],
-        (error, results) => {
-          if (error) {
-            console.error('Error updating item status:', error);
-            return connection.rollback(() => res.status(500).json({ error: 'Internal server error' }));
-          }
-
-          connection.query(
-            'INSERT INTO Reservation (UserID, ItemID, BorrowDate) VALUES (?, ?, CURRENT_DATE)',
-            [userId, itemId],
-            (err, results) => {
-              if (err) {
-                console.error('Error inserting into Reservation table:', err);
-                return connection.rollback(() => res.status(500).json({ error: 'Internal server error' }));
-              }
-
-              connection.commit((err) => {
-                if (err) {
-                  console.error('Error committing transaction:', err);
-                  return connection.rollback(() => res.status(500).json({ error: 'Internal server error' }));
-                }
-
-                return res.status(200).json({ success: true });
-              });
-            }
-          );
-        }
-      );
-    });
-  });
-
-  router.post("/returnItem", (req, res) => {
-    const itemId = req.body.itemId;
-
-    // Implement logic to update item status to 'Issued' and set ReturnDate to current date
-    connection.query(
-      'UPDATE Item SET Status = "Issued" WHERE ItemID = ?',
-      [itemId],
-      (error, results) => {
-        if (error) {
-          console.error('Error updating item status:', error);
-          return res.status(500).json({ error: 'Internal server error' });
-        }
-
+      router.post("/checkoutItem", (req, res) => {
+        const itemId = req.body.itemId;
+        const userId = req.body.userId;
+    
+        // Update item status to 'Issued'
         connection.query(
-          'UPDATE Reservation SET ReturnDate = CURRENT_DATE WHERE ItemID = ? AND ReturnDate IS NULL',
-          [itemId],
-          (err, results) => {
-            if (err) {
-              console.error('Error updating ReturnDate in Reservation table:', err);
-              return res.status(500).json({ error: 'Internal server error' });
+            'UPDATE Item SET Status = "Issued" WHERE ItemID = ?',
+            [itemId],
+            (error, itemUpdateResults) => {
+                if (error) {
+                    console.error('Error updating item status:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+    
+                // Insert into Reservation table
+                connection.query(
+                    'INSERT INTO Reservation (UserID, ItemID, BorrowDate) VALUES (?, ?, CURRENT_DATE)',
+                    [userId, itemId],
+                    (err, reservationInsertResults) => {
+                        if (err) {
+                            console.error('Error inserting into Reservation table:', err);
+                            return res.status(500).json({ error: 'Internal server error' });
+                        }
+    
+                        return res.status(200).json({ success: true });
+                    }
+                );
             }
-
-            return res.status(200).json({ success: true });
-          }
         );
-      }
-    );
-  });
+    });
+    
+    router.post("/returnItem", (req, res) => {
+        const itemId = req.body.itemId;
+    
+        // Update item status to 'Not Issued'
+        connection.query(
+            'UPDATE Item SET Status = "Not issued" WHERE ItemID = ?',
+            [itemId],
+            (error, itemUpdateResults) => {
+                if (error) {
+                    console.error('Error updating item status:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+    
+                // Update ReturnDate in Reservation table
+                connection.query(
+                    'UPDATE Reservation SET ReturnDate = CURRENT_DATE WHERE ItemID = ? AND ReturnDate IS NULL',
+                    [itemId],
+                    (err, reservationUpdateResults) => {
+                        if (err) {
+                            console.error('Error updating ReturnDate in Reservation table:', err);
+                            return res.status(500).json({ error: 'Internal server error' });
+                        }
+    
+                        return res.status(200).json({ success: true });
+                    }
+                );
+            }
+        );
+    });
   router.get("/getBorrower/:nfcId", (req, res) => {
     const nfcId = req.params.nfcId;
 
@@ -182,7 +170,7 @@ module.exports = (connection) => {
             }
 
             // Borrower found, return borrower details
-            const borrower = results[0];
+            const borrower = results;
             return res.status(200).json(borrower);
         }
     );

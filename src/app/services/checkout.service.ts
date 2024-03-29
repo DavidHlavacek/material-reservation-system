@@ -27,6 +27,7 @@ export class CheckoutService {
   }
 
   checkoutItem(itemId: number, userId: string): Observable<any> {
+    console.log(itemId, userId);
     return this.http.post(`${this.apiUrl}/checkoutItem`, { itemId, userId });
   }
 
