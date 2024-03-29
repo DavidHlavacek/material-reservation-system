@@ -106,16 +106,24 @@ export class HistoryListComponent implements OnInit, AfterViewInit {
   }
 
   async getReservationsFromBackend(): Promise<void> {
-    try {
-      const data: any = await this.historyService.getEntries().toPromise();
-      this.reservations = data;
-      this.dataSource = new MatTableDataSource<History>(this.reservations);
-      console.log('Reservations from backend:', this.reservations);
-    } catch (error: any) {
-      console.error('Error fetching items from the backend:', error);
-    }
+    this.historyService.getEntries().subscribe({
+      next: (data) => {
+        const reservations = data.map((reservation: any) => ({
+          ...reservation,
+          DateReserved: this.convertStringToDate(reservation.DateReserved),
+          DateReturned: reservation.DateReturned ? this.convertStringToDate(reservation.DateReturned) : reservation.DateReturned,
+        }));
+        this.dataSource = new MatTableDataSource<History>(reservations);
+        console.log('Reservations from backend:', reservations);
+      },
+      error: (error) => console.error('Error fetching items from the backend:', error),
+    });
   }
 
+  private convertStringToDate(dateStr: string): Date {
+    const [day, month, year] = dateStr.split('/').map(Number);
+    return new Date(year, month - 1, day);
+  }
   resetFormControl(control: FormControl): void {
     control.setValue('');
   }

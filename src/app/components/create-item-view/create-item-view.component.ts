@@ -37,11 +37,9 @@ import { CreateCategoryDialogComponent } from '../create-category-dialog/create-
 })
 export class CreateItemViewComponent {
   item: Item = {
-    ItemID: 1,
     CategoryName: '',
-    BarcodeID: 1,
     Name: '',
-    Status: 'Issued',
+    Status: 'Not issued',
   };
   categories: Category[] = [];
   selectedOptions: Category[] = [];
@@ -95,27 +93,21 @@ export class CreateItemViewComponent {
   }
 
   async onSubmit(item: Item): Promise<void> {
-    console.log('Submitting item onSubmit:', item); // Add this line
+    console.log('Submitting item onSubmit:', item);
     try {
-      const createdItem: Item = await this.itemService
-        .createItem(item)
-        .toPromise();
+      const createdItem: Item = await this.itemService.createItem(item).toPromise();
       console.log('Item created successfully:', createdItem);
+      // Reset item with the response from the server if needed, or just clear the form.
       this.item = {
-        ItemID: 1,
         CategoryName: '',
-        BarcodeID: 1,
         Name: '',
-        Status: 'Issued',
+        Status: 'Not issued', // Or reset based on your needs
       };
-
-      // Optionally, you can navigate to another page or perform other actions after successful submission.
+      // Navigate or perform other actions as needed
     } catch (error: any) {
       console.error('Error creating item:', error);
-      // Handle the error, show a message, or perform other actions.
     }
   }
-
   resetFormControl(formControl: FormControl) {
     formControl.setValue('');
   }

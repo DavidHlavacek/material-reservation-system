@@ -39,9 +39,9 @@
   <div>
     <mat-form-field>
       <mat-label>Status</mat-label>
-      <mat-select [(ngModel)]="item.Status" name="status" value="Issued">
-        <mat-option value="Issued">Issued</mat-option>
+      <mat-select [(ngModel)]="item.Status" name="status">
         <mat-option value="Not issued">Not issued</mat-option>
+        <mat-option value="Issued">Issued</mat-option>
         <mat-option value="Not returned">Not returned</mat-option>
         <mat-option value="Damaged">Damaged</mat-option>
       </mat-select>
