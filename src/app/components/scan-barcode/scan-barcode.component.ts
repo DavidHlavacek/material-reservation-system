@@ -49,7 +49,7 @@ export class ScanBarcodeComponent implements AfterViewInit {
     private renderer: Renderer2, 
     private el: ElementRef,
     private itemService: ItemService,
-    private historyService: HistoryService;
+    private historyService: HistoryService,
     private checkoutService: CheckoutService,
     ) {
     this.scanForm = this.fb.group({
