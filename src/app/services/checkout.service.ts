@@ -11,14 +11,11 @@ export class CheckoutService {
 
   constructor(private http: HttpClient) { }
 
-  getItemByBarcode(barcodeId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/itemByBarcode/${barcodeId}`);
-  }
 
   getUniqueReservation(itemBarcode: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/uniqueReservation/${itemBarcode}`);
   }
-  getNonUniqueReservation(itemBarcode: number, userBarcode:number): Observable<any> {
+  getNonUniqueReservation(itemBarcode: number, userBarcode: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/nonUniqueReservation/${itemBarcode}/${userBarcode}`);
   }
 
@@ -38,4 +35,14 @@ export class CheckoutService {
   getBorrower(nfcId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/getBorrower/${nfcId}`);
   }
+
+  // In your service:
+  getItemByBarcode(barcodeId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/itemByBarcode/${barcodeId}`);
+  }
+
+  getReservationByItemId(itemId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/uniqueReservation/${itemId}`);
+  }
+
 }

@@ -10,7 +10,7 @@
       <h3>{{error}}</h3>
       <p *ngIf="errorDisplayMode==InfoType.Item"><a href="/items">View Items</a></p>
     </div>
-    <div *ngIf="targetItem&&infoDisplayMode==InfoType.Item" class="info-box">
+    <div *ngIf="targetItem" class="info-box">
       <h3>&#x2139; Item found</h3>
       <p>Item ID: {{ targetItem?.ItemID }}</p>
       <p>Item name: {{ targetItem?.Name }}</p>

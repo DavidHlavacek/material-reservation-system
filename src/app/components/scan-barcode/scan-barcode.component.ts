@@ -7,6 +7,8 @@ import { CheckoutService } from '../../services/checkout.service';
 import { Observable, map } from 'rxjs';
 import { HistoryService } from '../../services/history.service';
 import { History } from '../../models/History';
+import { firstValueFrom } from 'rxjs';
+
 
 enum InfoType {
   None,
@@ -45,13 +47,13 @@ export class ScanBarcodeComponent implements AfterViewInit {
   isCheckout: boolean | null = null;
 
   constructor(
-    private fb: FormBuilder, 
-    private renderer: Renderer2, 
+    private fb: FormBuilder,
+    private renderer: Renderer2,
     private el: ElementRef,
     private itemService: ItemService,
     private historyService: HistoryService,
     private checkoutService: CheckoutService,
-    ) {
+  ) {
     this.scanForm = this.fb.group({
       barcode: ['', Validators.required],
     });
@@ -105,199 +107,238 @@ export class ScanBarcodeComponent implements AfterViewInit {
     this.error = "";
     this.processStatus = "";
     this.errorDisplayMode = InfoType.None;
-    if (barcode.startsWith("8900000000444")) {
-        console.log("Received CANCEL barcode");
-        this.cancelAll();
-        this.resetForm();
-        return;
+
+    if (barcode.startsWith("8900000000444")) { // Cancel operation
+      this.cancelAll();
+      this.resetForm();
+      return;
     }
+
     if (this.expectedBarcode === InfoType.Item) {
-      try {
-        await this.getItemFromBackend(parseInt(barcode)); // Wait for getItemFromBackend to complete
-        if (this.targetItem != null) {
-          console.log('recognized item');
-          const isUnique = this.isItemUnique();
-          if (isUnique) {
-            await this.getReservationFromBackend(parseInt(barcode)); // Wait for getReservationFromBackend to complete
-            if (this.targetReservation) {
-              this.userInstruction = "Enter Confirm or Cancel";
-              this.expectedBarcode = InfoType.Command;
-              this.infoDisplayMode = InfoType.Reservation;
-              this.isCheckout = false;
-              this.pageTitle = "Item Return";
-              this.resetForm();
-              return;
-            }
-            this.isCheckout = true;
-            this.pageTitle = "Item Checkout";
-          }
-          this.userInstruction = "Scan borrower barcode";
-          this.expectedBarcode = InfoType.User;
-          }
-      } catch (error) {
-        this.targetItem = null;
-        this.error = "Could not find item, please scan again";
-        this.errorDisplayMode = InfoType.Item;
-        console.error('Error fetching item details:', error);
-      }
+      await this.processItemBarcode(barcode);
+    } else if (this.expectedBarcode === InfoType.User) {
+      await this.processUserBarcode(barcode);
+    } else if (this.expectedBarcode === InfoType.Command) {
+      await this.processCommandBarcode(barcode);
     }
-    else if (this.expectedBarcode === InfoType.User) {
-      await this.getBorrowerFromBackend(parseInt(barcode));
-      if (this.targetUser) {
-        this.userInstruction = "Enter Confirm or Cancel";
-        this.expectedBarcode = InfoType.Command;
-        this.infoDisplayMode = InfoType.User;
-        if (!this.targetReservation) {
-          await this.getReservationFromBackend(this.targetItem.itemId, this.targetUser.NFCId);
-          if (this.targetReservation) {
-            this.isCheckout = false;
-            this.pageTitle = "Item Return";
-          }
-          else {
-            this.isCheckout = true;
-            this.pageTitle = "Item Checkout";
-          }
-        }
-      }
-    }
-    else if (this.expectedBarcode == InfoType.Command) {
-      if (barcode.startsWith('8900000000777')) {
-        if (this.targetItem && (this.targetUser || !this.isCheckout)) {
-          if (this.isCheckout === true) {
-            await this.checkoutService.checkoutItem(parseInt(this.targetItem.ItemID), this.targetUser.UserID);
-            this.processStatus = "Successfully checked out an item";
-          } else {
-            await this.checkoutService.returnItem(parseInt(this.targetItem.ItemID));
-            this.processStatus = "Successfully returned an item";
-          }
-        } else {
-          this.error = "Missing required information, scan CANCEL to continue";
-          console.log(this.targetItem, this.targetUser, this.targetReservation);
-          this.errorDisplayMode = InfoType.Command;
-        }
-      }
-    }
+
     this.resetForm();
   }
+
+  async processItemBarcode(barcode: string): Promise<void> {
+    try {
+      const itemResponse = await firstValueFrom(this.checkoutService.getItemByBarcode(parseInt(barcode)));
+      this.targetItem = itemResponse ? itemResponse[0] : null;
+      if (!this.targetItem) throw new Error('Item not found');
+
+      const reservationResponse = await firstValueFrom(this.checkoutService.getReservationByItemId(this.targetItem.ItemID));
+      this.targetReservation = reservationResponse && reservationResponse.length > 0 ? reservationResponse[0] : null;
+
+      // Determine next steps based on item and reservation status
+      if (this.targetReservation && this.targetItem.Status === 'Issued') {
+        // Setup for return process
+        this.isCheckout = false;
+        this.expectedBarcode = InfoType.Command; // Skip user barcode for returns
+        this.userInstruction = "Confirm return with command barcode";
+      } else {
+        // Setup for checkout process
+        this.isCheckout = true;
+        this.expectedBarcode = InfoType.User;
+        this.userInstruction = "Scan borrower barcode";
+      }
+    } catch (error) {
+      console.error('Error processing item barcode:', error);
+      this.error = "Could not process item, please try again";
+      this.errorDisplayMode = InfoType.Item;
+    }
+  }
+
+  // Continuing from your ScanBarcodeComponent...
+
+  async processUserBarcode(barcode: string): Promise<void> {
+    // Assuming barcode is the User ID for simplicity.
+    // In a real application, you might need to fetch user details based on the scanned barcode.
+    this.targetUser = { UserID: barcode }; // Simplified assumption
+    this.expectedBarcode = InfoType.Command; // Next, expect a command barcode to confirm action.
+    this.userInstruction = "Scan command barcode to confirm checkout";
+  }
+
+  async processCommandBarcode(barcode: string): Promise<void> {
+    if (barcode === '8900000000777') { // Assuming this barcode means "confirm action"
+      if (this.isCheckout) {
+        await this.checkoutItem();
+      } else {
+        await this.returnItem();
+      }
+    } else {
+      this.error = "Invalid command barcode. Please try again.";
+      this.errorDisplayMode = InfoType.Command;
+    }
+  }
+
+  async checkoutItem(): Promise<void> {
+    if (!this.targetItem || !this.targetUser) {
+      this.error = "Missing item or user information for checkout.";
+      this.errorDisplayMode = InfoType.Item; // Just a generic error display mode
+      return;
+    }
+
+    // Assuming targetItem.ItemID and targetUser.UserID hold the necessary IDs
+    this.checkoutService.checkoutItem(this.targetItem.ItemID, this.targetUser.UserID).subscribe({
+      next: () => {
+        this.processStatus = "Item checked out successfully.";
+        this.pageReset(); // Reset the scanning process after successful checkout
+      },
+      error: (err) => {
+        this.error = "Failed to checkout item. Please try again.";
+        console.error(err);
+      }
+    });
+  }
+
+  async returnItem(): Promise<void> {
+    if (!this.targetItem) {
+      this.error = "Missing item information for return.";
+      this.errorDisplayMode = InfoType.Item; // Just a generic error display mode
+      return;
+    }
+
+    // Assuming targetItem.ItemID holds the necessary ID
+    this.checkoutService.returnItem(this.targetItem.ItemID).subscribe({
+      next: () => {
+        this.processStatus = "Item returned successfully.";
+        this.pageReset(); // Reset the scanning process after successful return
+      },
+      error: (err) => {
+        this.error = "Failed to return item. Please try again.";
+        console.error(err);
+      }
+    });
+  }
+
+  // Utility method to reset the state after checkout or return
+  pageReset(): void {
+    this.scanForm.reset();
+    this.setFocus('barcode');
+    this.targetItem = null;
+    this.targetUser = null;
+    this.targetReservation = null;
+    this.isCheckout = null;
+    this.userInstruction = "Scan item barcode to begin";
+    this.expectedBarcode = InfoType.Item;
+    this.processStatus = "";
+    this.error = "";
+  }
+
 
   cancelAll(): void {
     this.processStatus = "Cancelled current process";
     this.pageReset();
   }
 
-  pageReset(): void {
-    this.resetForm();
-    this.setFocus('barcode');
-    this.targetItem = null;
-    this.targetReservation = null;
-    this.targetUser = null;
-    this.error = "";
-    this.pageTitle = "Scan barcode";
-    this.userInstruction = "Scan item barcode to begin";
-    this.expectedBarcode = InfoType.Item;
-  }
+
 
   async getItemFromBackend(barcode: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        this.checkoutService.getItemByBarcode(barcode).subscribe(
-            (itemDetails) => {
-                if (itemDetails) {
-                    this.targetItem = itemDetails[0];
-                    console.log(this.targetItem);
-                    resolve(); // Resolve the promise when the operation is complete
-                }
-            },
-            (error) => {
-                this.targetItem = null;
-                this.error = "Could not find item, please scan again";
-                this.errorDisplayMode = InfoType.Item;
-                console.error('Error fetching item details:', error);
-                reject(error); // Reject the promise if an error occurs
-            }
-        );
+      this.checkoutService.getItemByBarcode(barcode).subscribe(
+        (itemDetails) => {
+          if (itemDetails) {
+            this.targetItem = itemDetails[0];
+            console.log(this.targetItem);
+            resolve(); // Resolve the promise when the operation is complete
+          }
+        },
+        (error) => {
+          this.targetItem = null;
+          this.error = "Could not find item, please scan again";
+          this.errorDisplayMode = InfoType.Item;
+          console.error('Error fetching item details:', error);
+          reject(error); // Reject the promise if an error occurs
+        }
+      );
     });
   }
 
   async getBorrowerFromBackend(barcode: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        this.checkoutService.getBorrower(barcode).subscribe(
-            (borrowerDetails) => {
-                if (borrowerDetails) {
-                    this.targetUser = borrowerDetails[0];
-                    console.log("Borrower", this.targetUser);
-                    resolve(); // Resolve the promise when the operation is complete
-                }
-            },
-            (error) => {
-                this.targetUser = null;
-                this.error = "Could not find borrower, please try again";
-                this.errorDisplayMode = InfoType.User;
-                console.error('Error fetching borrower details:', error);
-                reject(error); // Reject the promise if an error occurs
-            }
-        );
+      this.checkoutService.getBorrower(barcode).subscribe(
+        (borrowerDetails) => {
+          if (borrowerDetails) {
+            this.targetUser = borrowerDetails[0];
+            console.log("Borrower", this.targetUser);
+            resolve(); // Resolve the promise when the operation is complete
+          }
+        },
+        (error) => {
+          this.targetUser = null;
+          this.error = "Could not find borrower, please try again";
+          this.errorDisplayMode = InfoType.User;
+          console.error('Error fetching borrower details:', error);
+          reject(error); // Reject the promise if an error occurs
+        }
+      );
     });
-}
+  }
 
-async getReservationFromBackend(itemBarcode: number, userBarcode?: number): Promise<void> {
+  async getReservationFromBackend(itemBarcode: number, userBarcode?: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (!itemBarcode) {
-            console.error('Item barcode is required.');
-            resolve(); // Resolve the promise immediately since no action is taken
-            return;
-        }
+      if (!itemBarcode) {
+        console.error('Item barcode is required.');
+        resolve(); // Resolve the promise immediately since no action is taken
+        return;
+      }
 
-        if (userBarcode === null || userBarcode === undefined) {
-            // No user barcode provided
-            this.checkoutService.getUniqueReservation(itemBarcode).subscribe(
-                (reservationDetails) => {
-                    this.handleReservationDetails(reservationDetails);
-                    resolve(); // Resolve the promise when the operation is complete
-                },
-                (error) => {
-                    this.targetReservation = null;
-                    console.error('Error fetching reservation details:', error);
-                    reject(error); // Reject the promise if an error occurs
-                }
-            );
-        } else {
-            // User barcode provided
-            this.checkoutService.getNonUniqueReservation(itemBarcode, userBarcode).subscribe(
-                (reservationDetails) => {
-                    this.handleReservationDetails(reservationDetails);
-                    resolve(); // Resolve the promise when the operation is complete
-                },
-                (error) => {
-                    this.targetReservation = null;
-                    console.error('Error fetching reservation details:', error);
-                    reject(error); // Reject the promise if an error occurs
-                }
-            );
-        }
+      if (userBarcode === null || userBarcode === undefined) {
+        // No user barcode provided
+        this.checkoutService.getUniqueReservation(itemBarcode).subscribe(
+          (reservationDetails) => {
+            this.handleReservationDetails(reservationDetails);
+            resolve(); // Resolve the promise when the operation is complete
+          },
+          (error) => {
+            this.targetReservation = null;
+            console.error('Error fetching reservation details:', error);
+            reject(error); // Reject the promise if an error occurs
+          }
+        );
+      } else {
+        // User barcode provided
+        this.checkoutService.getNonUniqueReservation(itemBarcode, userBarcode).subscribe(
+          (reservationDetails) => {
+            this.handleReservationDetails(reservationDetails);
+            resolve(); // Resolve the promise when the operation is complete
+          },
+          (error) => {
+            this.targetReservation = null;
+            console.error('Error fetching reservation details:', error);
+            reject(error); // Reject the promise if an error occurs
+          }
+        );
+      }
     });
-}
+  }
 
-private handleReservationDetails(reservationDetails: any[]): void {
+  private handleReservationDetails(reservationDetails: any[]): void {
     if (reservationDetails && reservationDetails.length > 0) {
-        console.log(reservationDetails);
-        this.targetReservation = reservationDetails[0];
-        console.log("Reservation", this.targetReservation);
+      console.log(reservationDetails);
+      this.targetReservation = reservationDetails[0];
+      console.log("Reservation", this.targetReservation);
     } else {
-        this.targetReservation = null;
+      this.targetReservation = null;
     }
   }
 
   isItemUnique(): boolean | null {
     if (!this.targetItem) {
-        return null;
+      return null;
     }
 
     const itemId = String(this.targetItem.ItemID);
 
     if (itemId.startsWith('1')) {
-        return true; // Unique item
+      return true; // Unique item
     } else if (itemId.startsWith('9')) {
-        return false; // Non-unique item
+      return false; // Non-unique item
     } else {
       // Uncomment the line below if you want to consider other cases as unique
       return true; // For any other cases, consider it as unique
